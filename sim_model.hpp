@@ -13,7 +13,7 @@
 SimCtrl* GetSimulationModel(double *kx){
 	SimCtrl* sim;
 	sim = new SimCtrl;
-	sim->display_level_ = 0;
+	sim->display_level_ = 1;
 	// input and initialize grid
 	sim->grid_ = new CCartGrid(60,60,1);
 	sim->grid_->InputDx(82.02);
@@ -34,58 +34,56 @@ SimCtrl* GetSimulationModel(double *kx){
 	sim->pvt_->set_pvtw_table("PVTW.DAT");
 
 	// initialize SAT
-//	sim->sat_ = new CSAT_TABLE;
-//	sim->sat_->SetSWOF(9,"SCAL.DAT");
-
 	sim->sat_ = new CSAT_COREY(0.1, 0.2 ,2.0 ,2.0 ,0.5 ,0.9 );
 
 	// initialize SCH
 	sim->sch_ = new CSchedule;
-	sim->sch_->SetTEnd(540.0);
+	sim->sch_->SetTEnd(600.0);
 	sim->sch_->SetTCurrent(0.0);
 	sim->sch_->SetTNext(sim->sch_->GetDt() + sim->sch_->GetTCurrent());
 	sim->sch_->SetdTmax(30.0);
 	vector<double> report_time;
-	report_time.push_back(180.0); report_time.push_back(360.0);report_time.push_back(540.0);
-	sim->sch_->SetReportTime(3, &report_time[0]);
+	report_time.push_back(100.0); report_time.push_back(200.0);report_time.push_back(300.0);
+	report_time.push_back(400.0); report_time.push_back(500.0);report_time.push_back(600.0);
+	sim->sch_->SetReportTime(6, &report_time[0]);
 
 	// initialize State
 	sim->InitializeState();
 	sim->SetInitPres(11482.94,5076.33);
+	// Set initial saturation equal to swi
 	sim->SetInitSat(0.1, 0.0);
-
 
 	// initialize Well
 	CStandardWell *p_1 = new CSTDProdWell("PROD-1", sim->grid_->GetIndex(4,19,0));
 	p_1->set_r(1);
 	p_1->set_ctrl_mode(CStandardWell::CBHP);
-	p_1->set_TL_BHP(2900.76);
+	p_1->set_TL_BHP(4931.3);
 	p_1->CalWellIndex(sim->grid_);
 	sim->std_well_.push_back(p_1);
 	CStandardWell *p_2 = new CSTDProdWell("PROD-2", sim->grid_->GetIndex(9,9,0));
 	p_2->set_r(1);
 	p_2->set_ctrl_mode(CStandardWell::CBHP);
-	p_2->set_TL_BHP(2900.76);
+	p_2->set_TL_BHP(4931.3);
 	p_2->CalWellIndex(sim->grid_);
 	sim->std_well_.push_back(p_2);
 	CStandardWell *p_3 = new CSTDProdWell("PROD-3", sim->grid_->GetIndex(54,54,0));
 	p_3->set_r(1);
 	p_3->set_ctrl_mode(CStandardWell::CBHP);
-	p_3->set_TL_BHP(2900.76);
+	p_3->set_TL_BHP(4931.3);
 	p_3->CalWellIndex(sim->grid_);
 	sim->std_well_.push_back(p_3);
 	//=====================================
 	CStandardWell *inj_1 = new CSTDWInjWell("INJ-1", sim->grid_->GetIndex(29,24, 0));
 	inj_1->set_r(1);
 	inj_1->set_ctrl_mode(CStandardWell::CBHP);
-	inj_1->set_TL_BHP(7251.9);
+	inj_1->set_TL_BHP(5148.8);
 	inj_1->CalWellIndex(sim->grid_);
 	sim->std_well_.push_back(inj_1);
 
 	CStandardWell *inj_2 = new CSTDWInjWell("INJ-2", sim->grid_->GetIndex(29,44, 0));
 	inj_2->set_r(1);
 	inj_2->set_ctrl_mode(CStandardWell::CBHP);
-	inj_2->set_TL_BHP(8702.28);
+	inj_2->set_TL_BHP(5148.8);
 	inj_2->CalWellIndex(sim->grid_);
 	sim->std_well_.push_back(inj_2);
 

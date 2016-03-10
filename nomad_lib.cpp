@@ -49,22 +49,44 @@ public:
 		vector<double> perm;
 		perm.resize(Nc);
 		GeneratePerm(Nc, &(m[0]), &(perm[0]));
-
+#ifdef DEBUG
+		SaveData("xi.debug",dim_,&(xi[0]));
+		SaveData("m.debug",Nc,&(m[0]));
+		SaveData("perm.debug",Nc,&(perm[0]));
+#endif
 		SimCtrl* sim = GetSimulationModel(&perm[0]);
 
 		sim->display_level_ = 0;
 		sim->RunSim();
+#ifdef DEBUG
+		sim->OutputResult();
+#endif
 		sim->hm_ = new CHistoryMatching;
-		sim->hm_->SetHMTarget("HIST.TXT");
+		ifstream in;
+		in.open("HIST_FILE.DATA");
+		string hist_file, temp_str;
+		if(in.is_open())
+			in >> temp_str >> hist_file;
+		else{
+			throw runtime_error("Can not open HIST_FILE.DATA");
+//			cout << "Can not open HIST_FILE.DATA" << endl;
+		}
+		in.close();
+//		cout << hist_file << endl;
+		sim->hm_->SetHMTarget(hist_file.c_str());
+//		cout << "Set history matching target..." << endl;
 		double Sd = sim->hm_->GetDataMismatch(sim->std_well_);
-		double Nd = 9;
+		double Nd = 48;
 		double Sm = 0.0;
 		for(int i=0;i<dim_;i++)
 			Sm += xi[i]*xi[i];
 		double S = 0.5*(Sd+Sm)/Nd;
 		x.set_bb_output  ( 0 , S); // objective value
 		count_eval = true; // count a black-box evaluation
-
+#ifdef DEBUG
+		SaveData("Sd.debug",1,&(Sd));
+		SaveData("Sm.debug",1,&(Sm));
+#endif
 		delete sim;
 		return true;       // the evaluation succeeded
 	}
@@ -116,7 +138,12 @@ int main ( int argc , char ** argv ) {
 		p.set_MODEL_SEARCH_OPTIMISTIC(0);
 		p.set_OPPORTUNISTIC_EVAL(0);
 		p.set_SPECULATIVE_SEARCH(0);
+#ifdef DEBUG
+		p.set_MAX_BB_EVAL(1);
+#endif
+#ifndef DEBUG
 		p.set_MAX_ITERATIONS (100);     // the algorithm terminates after
+#endif
 		// 100 black-box evaluations
 		p.set_DISPLAY_DEGREE(2);
 		p.set_SOLUTION_FILE("solution.txt");

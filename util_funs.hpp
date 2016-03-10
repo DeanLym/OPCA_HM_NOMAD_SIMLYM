@@ -37,6 +37,19 @@ void GeneratePerm(int Nc, double *x, double *perm){
 	}
 }
 
+void SaveData(string fn, int n, double* data){
+	//cout << "Saving data to " << fn << endl;
+	ofstream out;
+	out.open(fn.c_str());
 
+	if (out.is_open()){
+		for (int i = 0; i < n; i++){
+			out << data[i] << endl;
+		}
+		out.close();
+	}else{
+		throw runtime_error("Can not write file while saving data.");
+	}
+}
 
 #endif /* UTIL_FUNS_HPP_ */

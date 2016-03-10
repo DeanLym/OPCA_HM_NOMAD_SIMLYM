@@ -95,6 +95,7 @@
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
 								</inputType>
+								<outputType id="intel.linkstep.output.834377105" outputPrefix="" superClass="intel.linkstep.output"/>
 							</tool>
 						</toolChain>
 					</folderInfo>
