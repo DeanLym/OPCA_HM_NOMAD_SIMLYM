@@ -8,5 +8,5 @@ VAR1 					0.985000000000000
 VAR2 					1.67187500000000
 LOG_K_MIN 				-1.4
 LOG_K_MAX 				11.5
-USIG_FILE 				usig.dat
-XM_FILE 				xm.dat
+USIG_FILE 				/data/cees/yiminliu/global/model/bimodal/2_2d_channelized_wenyue/opca_model/usig.dat
+XM_FILE 				/data/cees/yiminliu/global/model/bimodal/2_2d_channelized_wenyue/opca_model/xm.dat
