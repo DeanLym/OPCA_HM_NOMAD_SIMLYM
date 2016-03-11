@@ -43,9 +43,10 @@ SimCtrl* GetSimulationModel(double *kx){
 	sim->sch_->SetTNext(sim->sch_->GetDt() + sim->sch_->GetTCurrent());
 	sim->sch_->SetdTmax(30.0);
 	vector<double> report_time;
+	report_time.push_back(0.5);
 	report_time.push_back(100.0); report_time.push_back(200.0);report_time.push_back(300.0);
 	report_time.push_back(400.0); report_time.push_back(500.0);report_time.push_back(600.0);
-	sim->sch_->SetReportTime(6, &report_time[0]);
+	sim->sch_->SetReportTime(7, &report_time[0]);
 
 	// initialize State
 	sim->InitializeState();

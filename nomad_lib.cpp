@@ -76,7 +76,7 @@ public:
 		sim->hm_->SetHMTarget(hist_file.c_str());
 //		cout << "Set history matching target..." << endl;
 		double Sd = sim->hm_->GetDataMismatch(sim->std_well_);
-		double Nd = 48;
+		double Nd = 54;
 		double Sm = 0.0;
 		for(int i=0;i<dim_;i++)
 			Sm += xi[i]*xi[i];
