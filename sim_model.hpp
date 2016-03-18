@@ -11,6 +11,7 @@
 #include "CSimCtrl.h"
 
 SimCtrl* GetSimulationModel(double *kx){
+	// sim file master
 	SimCtrl* sim;
 	sim = new SimCtrl;
 	sim->display_level_ = 0;
