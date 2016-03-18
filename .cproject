@@ -48,12 +48,12 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" id="intel.linux.x86_64.exe.dbg.1016410266_13.0.0" name="Debug" parent="intel.linux.x86_64.exe.dbg_13.0.0">
+				<configuration artifactExtension="" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.GmakeErrorParser;org.eclipse.cdt.core.ICCErrorParser" id="intel.linux.x86_64.exe.dbg.1016410266_13.0.0" name="Debug" parent="intel.linux.x86_64.exe.dbg_13.0.0" postannouncebuildStep="" postbuildStep="" preannouncebuildStep="" prebuildStep="">
 					<folderInfo id="intel.linux.x86_64.exe.dbg.1016410266._13.0.0" name="/" resourcePath="">
-						<toolChain id="intel.toolchain.linux.x86_64.exe.dbg.1889806919_13.0.0" name="Intel Toolchain for Executable on Intel(R) 64" superClass="intel.toolchain.linux.x86_64.exe.dbg_13.0.0">
+						<toolChain errorParsers="" id="intel.toolchain.linux.x86_64.exe.dbg.1889806919_13.0.0" name="Intel Toolchain for Executable on Intel(R) 64" superClass="intel.toolchain.linux.x86_64.exe.dbg_13.0.0">
 							<targetPlatform archList="x86_64" binaryParser="org.eclipse.cdt.core.ELF" id="intel.platform.linux.x86_64.exe.dbg_13.0.0.778240509" name="Platform.Executable.Debug" osList="linux" superClass="intel.platform.linux.x86_64.exe.dbg_13.0.0"/>
-							<builder buildPath="${workspace_loc:/OPCA_HM_NOMAD_SIMLYM}/Debug" id="intel.builder.linux.x86_64.exe.dbg.290622149_13.0.0" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Intel Builder" superClass="intel.builder.linux.x86_64.exe.dbg_13.0.0"/>
-							<tool id="intel.cpp.compilestep.linux.x86_64.exe.dbg.1662820616_13.0.0" name="Intel Intel(R) 64 C++ Compiler " superClass="intel.cpp.compilestep.linux.x86_64.exe.dbg_13.0.0">
+							<builder buildPath="${workspace_loc:/OPCA_HM_NOMAD_SIMLYM}/Debug" errorParsers="" id="intel.builder.linux.x86_64.exe.dbg.290622149_13.0.0" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Intel Builder" superClass="intel.builder.linux.x86_64.exe.dbg_13.0.0"/>
+							<tool command="icpc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GmakeErrorParser;org.eclipse.cdt.core.ICCErrorParser" id="intel.cpp.compilestep.linux.x86_64.exe.dbg.1662820616_13.0.0" name="Intel Intel(R) 64 C++ Compiler " superClass="intel.cpp.compilestep.linux.x86_64.exe.dbg_13.0.0">
 								<option id="intel.compilestep.preprocessor.includedirectories.1999012324" name="Additional Include Directories (-I)" superClass="intel.compilestep.preprocessor.includedirectories" valueType="includePath">
 									<listOptionValue builtIn="false" value="/usr/local/openmpi-1.6.2_intel13/include"/>
 									<listOptionValue builtIn="false" value="/data/cees/yiminliu/global/include/simlym"/>
@@ -63,14 +63,14 @@
 									<listOptionValue builtIn="false" value="/data/cees/yiminliu/global/include/armadillo"/>
 									<listOptionValue builtIn="false" value="/home/yiminliu/boost_1_56_0"/>
 								</option>
-								<option id="intel.compilestep.coptions.1060342920" name="Additional Options" superClass="intel.compilestep.coptions" value="-DUSE_MPI -DDEBUG" valueType="string"/>
+								<option id="intel.compilestep.coptions.1060342920" name="Additional Options" superClass="intel.compilestep.coptions" value="-DUSE_MPI " valueType="string"/>
 								<inputType id="intel.cpp.compilestep.input.1079464734" superClass="intel.cpp.compilestep.input"/>
 							</tool>
-							<tool id="intel.c.compilestep.linux.x86_64.exe.dbg.730159819_13.0.0" name="Intel Intel(R) 64 C Compiler" superClass="intel.c.compilestep.linux.x86_64.exe.dbg_13.0.0">
+							<tool command="icc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GmakeErrorParser;org.eclipse.cdt.core.ICCErrorParser" id="intel.c.compilestep.linux.x86_64.exe.dbg.730159819_13.0.0" name="Intel Intel(R) 64 C Compiler" superClass="intel.c.compilestep.linux.x86_64.exe.dbg_13.0.0">
 								<inputType id="intel.c.compilestep.input.1618991030" superClass="intel.c.compilestep.input"/>
 							</tool>
 							<tool id="intel.c.linkstep.linux.x86_64.exe.dbg.1253657582_13.0.0" name="Intel Intel(R) 64 C Linker" superClass="intel.c.linkstep.linux.x86_64.exe.dbg_13.0.0"/>
-							<tool id="intel.cpp.linkstep.linux.x86_64.exe.dbg.295094663_13.0.0" name="Intel Intel(R) 64 C++ Linker" superClass="intel.cpp.linkstep.linux.x86_64.exe.dbg_13.0.0">
+							<tool command="icpc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GmakeErrorParser;org.eclipse.cdt.core.ICCErrorParser" id="intel.cpp.linkstep.linux.x86_64.exe.dbg.295094663_13.0.0" name="Intel Intel(R) 64 C++ Linker" superClass="intel.cpp.linkstep.linux.x86_64.exe.dbg_13.0.0">
 								<option id="intel.linkstep.libpath.1808945309" name="Search Directory for Libraries (-L)" superClass="intel.linkstep.libpath" valueType="stringList">
 									<listOptionValue builtIn="false" value="/data/cees/yiminliu/global/lib"/>
 									<listOptionValue builtIn="false" value="/usr/local/openmpi-1.6.2_intel13/lib"/>
@@ -95,7 +95,7 @@
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
 								</inputType>
-								<outputType id="intel.linkstep.output.834377105" outputPrefix="DBG_" superClass="intel.linkstep.output"/>
+								<outputType id="intel.linkstep.output.834377105" outputPrefix="" superClass="intel.linkstep.output"/>
 							</tool>
 						</toolChain>
 					</folderInfo>
