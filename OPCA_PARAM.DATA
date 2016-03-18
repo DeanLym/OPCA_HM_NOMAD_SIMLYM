@@ -1,14 +1,14 @@
 L 						70
 NC 						3600
 NR 						1000
-GAMMA 					16.0693
-MU1 					2.40723
-MU2 					8.57031
-VAR1 					1.81875
-VAR2 					1.46611
-LOG_K_MIN 				-0.8
-LOG_K_MAX 				10.63
-USIG_FILE 				/data/cees/yiminliu/global/model/bimodal/3_2d_channelized_mine/opca_model/usig.dat
-XM_FILE 				/data/cees/yiminliu/global/model/bimodal/3_2d_channelized_mine/opca_model/xm.dat
+GAMMA 					16.5
+MU1 					2.5
+MU2 					8.5
+VAR1 					2.1
+VAR2 					1.6
+LOG_K_MIN 				0.0
+LOG_K_MAX 				10.0
+USIG_FILE 				/data/cees/yiminliu/global/model/bimodal/1_2d_channelized_haivo/opca_model/u_sig.dat
+XM_FILE 				/data/cees/yiminliu/global/model/bimodal/1_2d_channelized_haivo/opca_model/xm.dat
 
 
