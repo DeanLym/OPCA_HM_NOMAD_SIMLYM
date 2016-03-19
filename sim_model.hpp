@@ -35,9 +35,9 @@ SimCtrl* GetSimulationModel(double *kx){
 	sim->pvt_->set_pvtw_table("PVTW.DAT");
 
 	// initialize SAT
-	//	sim->sat_ = new CSAT_COREY(0.1, 0.2 ,2.0 ,2.0 ,0.5 ,0.9 );
-	sim->sat_ = new CSAT_TABLE;
-	sim->sat_->SetSWOF(16,"SCAL.DAT");
+	sim->sat_ = new CSAT_COREY(0.1, 0.2 ,2.0 ,2.0 ,0.5 ,0.9 );
+//	sim->sat_ = new CSAT_TABLE;
+//	sim->sat_->SetSWOF(16,"SCAL.DAT");
 
 	// initialize SCH
 	sim->sch_ = new CSchedule;
