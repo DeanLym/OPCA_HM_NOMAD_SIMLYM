@@ -31,6 +31,14 @@ void TranformUniform2Normal(int l , vector<double> &m){
 	}
 }
 
+double TransformUniform2Normal_2(double u,double mu, double sigma){
+	double x;
+	x = mu + 1.4142135623 * sigma * erf_inv( 2*u - 1 );
+	return x;
+}
+
+
+
 void GeneratePerm(int Nc, double *x, double *perm){
 	for(int i=0; i < Nc ; i++){
 		perm[i] = exp(x[i]);

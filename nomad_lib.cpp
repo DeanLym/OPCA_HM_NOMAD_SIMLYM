@@ -21,8 +21,9 @@ class My_Evaluator : public Evaluator {
 public:
 	My_Evaluator  ( const Parameters & p ) :
 		Evaluator ( p ) {
-			opca_bm_ = new OPCA_BIMODAL(1,1,1,1);
-			dim_ = 1;
+		opca_bm_  = new OPCA_BIMODAL(1,1,1,1);
+		dim_opca_ = 1;
+		dim_kr_   = 1;
 	}
 
 	~My_Evaluator ( void ) {
@@ -30,30 +31,30 @@ public:
 	}
 
 	void update_iteration	(	NOMAD::success_type 	success,
-	const NOMAD::Stats & 	stats,
-	const NOMAD::Evaluator_Control & 	ev_control,
-	const NOMAD::Barrier & 	true_barrier,
-	const NOMAD::Barrier & 	sgte_barrier,
-	const NOMAD::Pareto_Front & 	pareto_front,
-	bool & 	stop
+			const NOMAD::Stats & 	stats,
+			const NOMAD::Evaluator_Control & 	ev_control,
+			const NOMAD::Barrier & 	true_barrier,
+			const NOMAD::Barrier & 	sgte_barrier,
+			const NOMAD::Pareto_Front & 	pareto_front,
+			bool & 	stop
 	)	{
-//		  num_iterations_ += 1;
-		  int num_iter  = stats.get_iterations();
-//		  cout << "Iteration # " << num_iter << "....";
-//		  if(success    == NOMAD::UNSUCCESSFUL ){
-//			  cout << "fails" << endl;
-//		  }else{
-//			  cout << "is successful." << endl;
-//		  }
-		  int num_eval  = stats.get_eval();
-//		  cout << "Number of function evaluations: " << num_eval << "..." << endl;
-		  int real_time = stats.get_real_time();
-//		  cout << "Wall clock time: " << real_time << "..." << endl;
+		//		  num_iterations_ += 1;
+		int num_iter  = stats.get_iterations();
+		//		  cout << "Iteration # " << num_iter << "....";
+		//		  if(success    == NOMAD::UNSUCCESSFUL ){
+		//			  cout << "fails" << endl;
+		//		  }else{
+		//			  cout << "is successful." << endl;
+		//		  }
+		int num_eval  = stats.get_eval();
+		//		  cout << "Number of function evaluations: " << num_eval << "..." << endl;
+		int real_time = stats.get_real_time();
+		//		  cout << "Wall clock time: " << real_time << "..." << endl;
 
-		  ofstream ofs;
-		  ofs.open("iter.txt",std::ofstream::out | std::ofstream::app);
-		  ofs << num_iter << "\t" << num_eval << "\t" << real_time << endl;
-		  ofs.close();
+		ofstream ofs;
+		ofs.open("iter.txt",std::ofstream::out | std::ofstream::app);
+		ofs << num_iter << "\t" << num_eval << "\t" << real_time << endl;
+		ofs.close();
 
 	}
 
@@ -63,11 +64,11 @@ public:
 	{
 		vector<double> xi;
 		double temp;
-		for(int i=0;i<dim_;i++){
+		for(int i=0;i<dim_opca_;i++){
 			temp = x[i].value();
 			xi.push_back(temp);
 		}
-		TranformUniform2Normal(dim_,xi);
+		TranformUniform2Normal(dim_opca_,xi);
 
 		double Nc = 3600;
 		vector<double> m;
@@ -76,12 +77,41 @@ public:
 		vector<double> perm;
 		perm.resize(Nc);
 		GeneratePerm(Nc, &(m[0]), &(perm[0]));
+
+		// Transform kr parameters
+		vector<double> kr;
+
+		// Prior mean for kr parameters
+		vector<double> kr_avg;
+		kr_avg.push_back(0.16);
+		kr_avg.push_back(0.16);
+		kr_avg.push_back(2.6);
+		kr_avg.push_back(2.4);
+		kr_avg.push_back(0.38);
+		kr_avg.push_back(0.7);
+
+		vector<double> kr_std;
+		kr_std.push_back(0.05);
+		kr_std.push_back(0.05);
+		kr_std.push_back(0.5);
+		kr_std.push_back(0.5);
+		kr_std.push_back(0.1);
+		kr_std.push_back(0.1);
+
+		for(int i=0; i<dim_kr_; i++){
+			temp = x[i+dim_opca_].value();
+			temp = TransformUniform2Normal_2(temp,kr_avg[i],kr_std[i]);
+			kr.push_back(temp);
+		}
+
 #ifdef DEBUG
 		SaveData("xi.debug",dim_,&(xi[0]));
 		SaveData("m.debug",Nc,&(m[0]));
 		SaveData("perm.debug",Nc,&(perm[0]));
+		SaveData("kr.debug",dim_kr_,&(kr[0]));
 #endif
-		SimCtrl* sim = GetSimulationModel(&perm[0]);
+
+		SimCtrl* sim = GetSimulationModel(&perm[0],kr);
 
 		sim->display_level_ = 0;
 		sim->RunSim();
@@ -96,30 +126,40 @@ public:
 			in >> temp_str >> hist_file;
 		else{
 			throw runtime_error("Can not open HIST_FILE.DATA");
-//			cout << "Can not open HIST_FILE.DATA" << endl;
+			//			cout << "Can not open HIST_FILE.DATA" << endl;
 		}
 		in.close();
-//		cout << hist_file << endl;
+		//		cout << hist_file << endl;
 		sim->hm_->SetHMTarget(hist_file.c_str());
-//		cout << "Set history matching target..." << endl;
+		//		cout << "Set history matching target..." << endl;
 		double Sd = sim->hm_->GetDataMismatch(sim->std_well_);
 		double Nd = 168;
-		double Sm = 0.0;
-		for(int i=0;i<dim_;i++)
-			Sm += xi[i]*xi[i];
-		double S = 0.5*(Sd+Sm)/Nd;
-		x.set_bb_output  ( 0 , S); // objective value
-		count_eval = true; // count a black-box evaluation
+
+		// Calculate model mismatch of xi
+		double Sm_xi = 0.0;
+		for(int i=0; i<dim_opca_;i++)
+			Sm_xi += xi[i]*xi[i];
+		// Calculate model mismatch of kr parameters
+		double Sm_kr = 0.0;
+		for(int i=0; i<dim_kr_;  i++)
+			Sm_kr += pow((kr[i]-kr_avg[i])/kr_std[i],2);
+		// Calculate normalized model mismatch + data mismatch
+		double S = 0.5*(Sd+Sm_kr+Sm_xi)/Nd;
 #ifdef DEBUG
 		SaveData("Sd.debug",1,&(Sd));
-		SaveData("Sm.debug",1,&(Sm));
+		SaveData("Sm_xi.debug",1,&(Sm_xi));
+		SaveData("Sm_kr.debug",1,&(Sm_kr));
 #endif
+		x.set_bb_output  ( 0 , S); // objective value
+		count_eval = true; // count a black-box evaluation
+
 		delete sim;
 		return true;       // the evaluation succeeded
 	}
 public:
 	OPCA_BIMODAL* opca_bm_;
-	int dim_;
+	int 		  dim_opca_;
+	int 	      dim_kr_;
 };
 
 
@@ -145,7 +185,9 @@ int main ( int argc , char ** argv ) {
 		// parameters creation:
 		Parameters p ( out );
 
-		int dim = 70;
+		int dim_opca = 70;
+		int dim_kr   = 6;
+		int dim     = dim_opca + dim_kr;
 		p.set_DIMENSION (dim);             // number of variables
 
 		vector<bb_output_type> bbot (1); // definition of
@@ -157,8 +199,8 @@ int main ( int argc , char ** argv ) {
 
 		p.set_X0 ("ui_start.dat");  // starting point
 
-		p.set_LOWER_BOUND ( Point ( 70 , 0.0001 ) ); // all var. >= -6
-		p.set_UPPER_BOUND ( Point ( 70 , 0.9999 ) ); // all var. >= -6
+		p.set_LOWER_BOUND ( Point ( dim , 0.0001 ) ); // all var. >= -6
+		p.set_UPPER_BOUND ( Point ( dim , 0.9999 ) ); // all var. >= -6
 
 		p.set_INITIAL_MESH_SIZE(0.2);
 		p.set_SNAP_TO_BOUNDS(0);
@@ -189,8 +231,9 @@ int main ( int argc , char ** argv ) {
 
 		// custom evaluator creation:
 		My_Evaluator ev   ( p );
-		ev.opca_bm_ = GenerateOPCAModel();
-		ev.dim_ = dim;
+		ev.opca_bm_  = GenerateOPCAModel();
+		ev.dim_opca_ = dim_opca;
+		ev.dim_kr_   = dim_kr;
 
 		// algorithm creation and execution:
 		Mads mads ( p , &ev );

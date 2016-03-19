@@ -10,7 +10,7 @@
 
 #include "CSimCtrl.h"
 
-SimCtrl* GetSimulationModel(double *kx){
+SimCtrl* GetSimulationModel(double *kx, vector<double> kr){
 	// Model 1 Simulator file
 	SimCtrl* sim;
 	sim = new SimCtrl;
@@ -26,7 +26,6 @@ SimCtrl* GetSimulationModel(double *kx){
 	sim->grid_->InputKz(kx);
 	sim->grid_->InputPoro(0.2);
 	sim->InitializeGrid();
-	//sim->grid_->OutputConnList();
 
 	// initialize PVT
 	sim->pvt_ = new CPVT;
@@ -35,7 +34,10 @@ SimCtrl* GetSimulationModel(double *kx){
 	sim->pvt_->set_pvtw_table("PVTW.DAT");
 
 	// initialize SAT
-	sim->sat_ = new CSAT_COREY(0.1, 0.2 ,2.0 ,2.0 ,0.5 ,0.9 );
+	double swi  = kr[0], sor  = kr[1];
+	double aw   = kr[2], ao   = kr[3];
+	double krw0 = kr[4], kro0 = kr[5];
+	sim->sat_   = new CSAT_COREY(swi, sor , aw ,ao ,krw0 ,kro0 );
 //	sim->sat_ = new CSAT_TABLE;
 //	sim->sat_->SetSWOF(16,"SCAL.DAT");
 
