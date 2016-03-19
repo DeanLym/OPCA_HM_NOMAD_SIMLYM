@@ -12,7 +12,6 @@ using namespace NOMAD; //avoids putting  everywhere
 #include "util_funs.hpp"
 #include <armadillo>
 
-
 using namespace arma;
 
 /*----------------------------------------*/
@@ -28,6 +27,34 @@ public:
 
 	~My_Evaluator ( void ) {
 		delete opca_bm_;
+	}
+
+	void update_iteration	(	NOMAD::success_type 	success,
+	const NOMAD::Stats & 	stats,
+	const NOMAD::Evaluator_Control & 	ev_control,
+	const NOMAD::Barrier & 	true_barrier,
+	const NOMAD::Barrier & 	sgte_barrier,
+	const NOMAD::Pareto_Front & 	pareto_front,
+	bool & 	stop
+	)	{
+//		  num_iterations_ += 1;
+		  int num_iter  = stats.get_iterations();
+//		  cout << "Iteration # " << num_iter << "....";
+//		  if(success    == NOMAD::UNSUCCESSFUL ){
+//			  cout << "fails" << endl;
+//		  }else{
+//			  cout << "is successful." << endl;
+//		  }
+		  int num_eval  = stats.get_eval();
+//		  cout << "Number of function evaluations: " << num_eval << "..." << endl;
+		  int real_time = stats.get_real_time();
+//		  cout << "Wall clock time: " << real_time << "..." << endl;
+
+		  ofstream ofs;
+		  ofs.open("iter.txt",std::ofstream::out | std::ofstream::app);
+		  ofs << num_iter << "\t" << num_eval << "\t" << real_time << endl;
+		  ofs.close();
+
 	}
 
 	bool eval_x ( Eval_Point   & x          ,
@@ -98,6 +125,9 @@ public:
 
 
 
+
+
+
 /*------------------------------------------*/
 /*            NOMAD main function           */
 /*------------------------------------------*/
@@ -133,6 +163,8 @@ int main ( int argc , char ** argv ) {
 		p.set_INITIAL_MESH_SIZE(0.2);
 		p.set_SNAP_TO_BOUNDS(0);
 		p.set_DIRECTION_TYPE(NOMAD::ORTHO_2N);
+
+		p.set_MODEL_SEARCH(0);
 		p.set_ASYNCHRONOUS(0);
 		p.set_MODEL_EVAL_SORT(0);
 		p.set_MODEL_SEARCH_OPTIMISTIC(0);
