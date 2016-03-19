@@ -178,8 +178,10 @@ int main ( int argc , char ** argv ) {
 #endif
 		// 100 black-box evaluations
 		p.set_DISPLAY_DEGREE(2);
+#ifndef DEBUG
 		p.set_SOLUTION_FILE("solution.txt");
 		p.set_STATS_FILE("stats.txt","eval bbe obj sol");
+#endif
 		p.set_ADD_SEED_TO_FILE_NAMES(0);
 
 		// parameters validation:
