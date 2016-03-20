@@ -105,7 +105,7 @@ public:
 		}
 
 #ifdef DEBUG
-		SaveData("xi.debug",dim_,&(xi[0]));
+		SaveData("xi.debug",dim_opca_,&(xi[0]));
 		SaveData("m.debug",Nc,&(m[0]));
 		SaveData("perm.debug",Nc,&(perm[0]));
 		SaveData("kr.debug",dim_kr_,&(kr[0]));
