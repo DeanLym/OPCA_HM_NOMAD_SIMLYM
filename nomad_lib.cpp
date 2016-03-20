@@ -133,7 +133,13 @@ public:
 		sim->hm_->SetHMTarget(hist_file.c_str());
 		//		cout << "Set history matching target..." << endl;
 		double Sd = sim->hm_->GetDataMismatch(sim->std_well_);
-		double Nd = 168;
+
+		// Read number of data points
+		double Nd = 1.0;
+		ifstream ifs;
+		ifs.open(hist_file.c_str());
+		ifs >> Nd;
+		ifs.close();
 
 		// Calculate model mismatch of xi
 		double Sm_xi = 0.0;

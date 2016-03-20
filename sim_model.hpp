@@ -43,14 +43,15 @@ SimCtrl* GetSimulationModel(double *kx, vector<double> kr){
 
 	// initialize SCH
 	sim->sch_ = new CSchedule;
-	sim->sch_->SetTEnd(600.0);
+	sim->sch_->SetTEnd(1000.0);
 	sim->sch_->SetTCurrent(0.0);
 	sim->sch_->SetTNext(sim->sch_->GetDt() + sim->sch_->GetTCurrent());
 	sim->sch_->SetdTmax(100.0);
 	vector<double> report_time;
-	report_time.push_back(100.0); report_time.push_back(200.0);report_time.push_back(300.0);
-	report_time.push_back(400.0); report_time.push_back(500.0);report_time.push_back(600.0);
-	sim->sch_->SetReportTime(6, &report_time[0]);
+	int num_report_time = 10;
+	for(int i=0; i<num_report_time ;i++)
+		report_time.push_back((i+1)*100);
+	sim->sch_->SetReportTime(num_report_time, &report_time[0]);
 
 	// initialize State
 	sim->InitializeState();
