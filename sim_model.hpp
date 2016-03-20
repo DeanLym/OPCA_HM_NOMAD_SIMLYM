@@ -56,7 +56,7 @@ SimCtrl* GetSimulationModel(double *kx, vector<double> kr){
 	sim->InitializeState();
 	sim->SetInitPres(25590.55,4713.735);
 	// Set initial saturation equal to swi
-	sim->SetInitSat(0.1, 0.0);
+	sim->SetInitSat(swi, 0.0);
 
 	// initialize Well
 	double bhp_ = 2175.57;
@@ -150,7 +150,7 @@ SimCtrl* GetSimulationModel(double *kx, vector<double> kr){
 	inj_1->set_r(0.5);
 	inj_1->set_ctrl_mode(CStandardWell::CWRAT);
 	inj_1->set_TL_WRAT(wrat_target_inj);
-	inj_1->set_TL_BHP(bhp_limit_inj);
+	inj_1->set_TL_BHP(bhp_limit_inj)0.1;
 	inj_1->CalWellIndex(sim->grid_);
 	sim->std_well_.push_back(inj_1);
 
