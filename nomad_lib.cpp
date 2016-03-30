@@ -56,6 +56,11 @@ public:
 		ofs << num_iter << "\t" << num_eval << "\t" << real_time << endl;
 		ofs.close();
 
+		if(num_iter == 10){
+
+		}
+
+
 	}
 
 	bool eval_x ( Eval_Point   & x          ,
@@ -184,6 +189,7 @@ int main ( int argc , char ** argv ) {
 	out.precision ( DISPLAY_PRECISION_STD );
 
 	try {
+		out << endl << open_block ( "MADS run # 1" );
 
 		// NOMAD initializations:
 		begin ( argc , argv );
@@ -212,6 +218,11 @@ int main ( int argc , char ** argv ) {
 		p.set_SNAP_TO_BOUNDS(0);
 		p.set_DIRECTION_TYPE(NOMAD::ORTHO_2N);
 
+		// Fix variables
+		for(int k = 10; k < 70; k++)
+			p.set_FIXED_VARIABLE(k);
+
+
 		p.set_MODEL_SEARCH(0);
 		p.set_ASYNCHRONOUS(0);
 		p.set_MODEL_EVAL_SORT(0);
@@ -222,16 +233,15 @@ int main ( int argc , char ** argv ) {
 		p.set_MAX_BB_EVAL(1);
 #endif
 #ifndef DEBUG
-		p.set_MAX_ITERATIONS (100);     // the algorithm terminates after
+		p.set_MAX_ITERATIONS (1);     // the algorithm terminates after
 #endif
 		// 100 black-box evaluations
 		p.set_DISPLAY_DEGREE(2);
-#ifndef DEBUG
-		p.set_SOLUTION_FILE("solution.txt");
-		p.set_STATS_FILE("stats.txt","eval bbe obj sol");
-#endif
 		p.set_ADD_SEED_TO_FILE_NAMES(0);
-
+#ifndef DEBUG
+		p.set_SOLUTION_FILE("solution_l1.txt");
+		p.set_STATS_FILE("stats_l1.txt","eval bbe obj sol");
+#endif
 		// parameters validation:
 		p.check();
 
@@ -244,6 +254,27 @@ int main ( int argc , char ** argv ) {
 		// algorithm creation and execution:
 		Mads mads ( p , &ev );
 		mads.run();
+		cout << "Finished Level 1 runs. " << endl;
+		// Multilevel 2
+
+		p.reset_X0();
+#ifndef DEBUG
+		p.set_SOLUTION_FILE("solution_l2.txt");
+		p.set_STATS_FILE("stats_l2.txt","eval bbe obj sol");
+#endif
+		p.set_X0("solution_l2.txt");
+		//		for(int k = 10; k < 70; k++)
+		//			p.set_FREE_VARIABLE(k);
+		//		for(int k = 0; k < 10; k++)
+		//			p.set_FIXED_VARIABLE(k);
+		//		for(int k = 20; k < 70; k++)
+		//			p.set_FIXED_VARIABLE(k);
+		p.check();
+		mads.reset(true , true);
+		mads.run();
+		out.close_block();
+		// Multilevel 3
+
 	}
 	catch ( exception & e ) {
 		cerr << "\nNOMAD has been interrupted (" << e.what() << ")\n\n";
