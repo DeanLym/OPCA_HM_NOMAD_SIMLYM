@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+<?fileVersion 4.0.0?>
+
+<cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
 	<storageModule moduleId="org.eclipse.cdt.core.settings">
 		<cconfiguration id="intel.linux.x86_64.exe.rel.1529407590_13.0.0">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="intel.linux.x86_64.exe.rel.1529407590_13.0.0" moduleId="org.eclipse.cdt.core.settings" name="Release">
@@ -55,13 +57,13 @@
 							<builder buildPath="${workspace_loc:/OPCA_HM_NOMAD_SIMLYM}/Debug" errorParsers="" id="intel.builder.linux.x86_64.exe.dbg.290622149_13.0.0" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Intel Builder" superClass="intel.builder.linux.x86_64.exe.dbg_13.0.0"/>
 							<tool command="icpc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GmakeErrorParser;org.eclipse.cdt.core.ICCErrorParser" id="intel.cpp.compilestep.linux.x86_64.exe.dbg.1662820616_13.0.0" name="Intel Intel(R) 64 C++ Compiler " superClass="intel.cpp.compilestep.linux.x86_64.exe.dbg_13.0.0">
 								<option id="intel.compilestep.preprocessor.includedirectories.1999012324" name="Additional Include Directories (-I)" superClass="intel.compilestep.preprocessor.includedirectories" valueType="includePath">
-									<listOptionValue builtIn="false" value="/usr/local/openmpi-1.6.2_intel13/include"/>
 									<listOptionValue builtIn="false" value="/data/cees/yiminliu/global/include/simlym"/>
 									<listOptionValue builtIn="false" value="/data/cees/yiminliu/global/include/lapack"/>
 									<listOptionValue builtIn="false" value="/data/cees/yiminliu/global/include/opca"/>
 									<listOptionValue builtIn="false" value="/data/cees/yiminliu/global/include/armadillo"/>
 									<listOptionValue builtIn="false" value="/home/yiminliu/boost_1_56_0"/>
 									<listOptionValue builtIn="false" value="/home/yiminliu/nomad.3.6.2/src"/>
+									<listOptionValue builtIn="false" value="/usr/local/openmpi-1.4.3_intel_14/include"/>
 								</option>
 								<option id="intel.compilestep.coptions.1060342920" name="Additional Options" superClass="intel.compilestep.coptions" value="-DUSE_MPI" valueType="string"/>
 								<inputType id="intel.cpp.compilestep.input.1079464734" superClass="intel.cpp.compilestep.input"/>
@@ -74,7 +76,7 @@
 								<option id="intel.linkstep.libpath.1808945309" name="Search Directory for Libraries (-L)" superClass="intel.linkstep.libpath" valueType="stringList">
 									<listOptionValue builtIn="false" value="/data/cees/yiminliu/global/lib"/>
 									<listOptionValue builtIn="false" value="/home/yiminliu/nomad.3.6.2/lib"/>
-									<listOptionValue builtIn="false" value="/usr/local/openmpi-1.6.2_intel13/lib"/>
+									<listOptionValue builtIn="false" value="/usr/local/openmpi-1.4.3_intel_14/lib"/>
 								</option>
 								<option id="intel.linkstep.libname.266107366" name="Additional Libraries (-l)" superClass="intel.linkstep.libname" valueType="libs">
 									<listOptionValue builtIn="false" value="nomadmpi"/>
