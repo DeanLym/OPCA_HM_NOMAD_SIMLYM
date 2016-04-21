@@ -10,9 +10,9 @@ using namespace NOMAD; //avoids putting  everywhere
 #include "sim_model.hpp"
 #include "generate_opca_model.hpp"
 #include "util_funs.hpp"
-#include <armadillo>
+// #include <armadillo>
 
-using namespace arma;
+// using namespace arma;
 
 /*----------------------------------------*/
 /*               The problem              */
