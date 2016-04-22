@@ -30,6 +30,8 @@ public:
 		delete opca_bm_;
 	}
 
+
+
 	void update_iteration	(	NOMAD::success_type 	success,
 			const NOMAD::Stats & 	stats,
 			const NOMAD::Evaluator_Control & 	ev_control,
@@ -144,11 +146,11 @@ public:
 		// Calculate model mismatch of xi
 		double Sm_xi = 0.0;
 		for(int i=0; i<dim_opca_;i++)
-			Sm_xi += xi[i]*xi[i];
+			Sm_xi += (xi[i]-xi_uc[i])*(xi[i]-xi_uc[i]);
 		// Calculate model mismatch of kr parameters
 		double Sm_kr = 0.0;
 		for(int i=0; i<dim_kr_;  i++)
-			Sm_kr += pow((kr[i]-kr_avg[i])/kr_std[i],2);
+			Sm_kr += pow((kr[i]-kr_avg[i])/kr_std[i]-kr_uc[i],2);
 		// Calculate normalized model mismatch + data mismatch
 		double S = 0.5*(Sd+Sm_kr+Sm_xi)/Nd;
 #ifdef DEBUG
@@ -166,6 +168,8 @@ public:
 	OPCA_BIMODAL* opca_bm_;
 	int 		  dim_opca_;
 	int 	      dim_kr_;
+	vector<double> xi_uc;
+	vector<double> kr_uc;
 };
 
 
@@ -184,27 +188,32 @@ int main ( int argc , char ** argv ) {
 	out.precision ( DISPLAY_PRECISION_STD );
 
 	try {
-
+		cout << "Begins" << endl;
 		// NOMAD initializations:
 		begin ( argc , argv );
-
+		cout << "Begined" << endl;
 		// parameters creation:
 		Parameters p ( out );
-
+		cout << "Initialize parameter" << endl;
 		int dim_opca = 70;
 		int dim_kr   = 6;
 		int dim     = dim_opca + dim_kr;
 		p.set_DIMENSION (dim);             // number of variables
-
+		cout << "Set dimension" << endl;
 		vector<bb_output_type> bbot (1); // definition of
 		bbot[0] = OBJ;                   // output types
 		p.set_BB_OUTPUT_TYPE ( bbot );
 
 		//    p.set_DISPLAY_ALL_EVAL(true);   // displays all evaluations.
 		p.set_DISPLAY_STATS ( "bbe obj" );
-
+		cout << "Set X0" << endl;
+#ifdef DEBUG
+		cout << "Set X0" << endl;
+#endif
 		p.set_X0 ("ui_start.dat");  // starting point
-
+#ifdef DEBUG
+		cout << "Set X0 finished" << endl;
+#endif
 		p.set_LOWER_BOUND ( Point ( dim , 0.0001 ) ); // all var. >= -6
 		p.set_UPPER_BOUND ( Point ( dim , 0.9999 ) ); // all var. >= -6
 
@@ -234,12 +243,43 @@ int main ( int argc , char ** argv ) {
 
 		// parameters validation:
 		p.check();
-
+#ifdef DEBUG
+		cout << "Generate OPCA Model" << endl;
+#endif
 		// custom evaluator creation:
 		My_Evaluator ev   ( p );
 		ev.opca_bm_  = GenerateOPCAModel();
 		ev.dim_opca_ = dim_opca;
 		ev.dim_kr_   = dim_kr;
+
+		// read unconditional realizations:
+		ifstream ifs;
+		ifs.open("UC_FILE.DATA");
+		string xi_uc_file, kr_uc_file, temp_str;
+		if(ifs.is_open()){
+			ifs >> temp_str >> xi_uc_file;
+			ifs >> temp_str >> kr_uc_file;
+		}
+#ifdef DEBUG
+		cout << xi_uc_file << endl;
+		cout << kr_uc_file << endl;
+#endif
+		ifs.close();
+		double temp_data;
+		// Read xi_uc
+		ifs.open(xi_uc_file.c_str());
+		for(int i = 0; i < ev.dim_opca_; i++){
+			ifs >> temp_data;
+			ev.xi_uc.push_back(temp_data);
+		}
+		ifs.close();
+		// Read kr_uc
+		ifs.open(kr_uc_file.c_str());
+		for(int i = 0; i < ev.dim_kr_; i++){
+			ifs >> temp_data;
+			ev.kr_uc.push_back(temp_data);
+		}
+		ifs.close();
 
 		// algorithm creation and execution:
 		Mads mads ( p , &ev );
