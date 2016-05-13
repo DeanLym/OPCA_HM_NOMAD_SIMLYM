@@ -10,9 +10,9 @@ using namespace NOMAD; //avoids putting  everywhere
 #include "sim_model.hpp"
 #include "generate_opca_model.hpp"
 #include "util_funs.hpp"
-#include <armadillo>
+//#include <armadillo>
 
-using namespace arma;
+//using namespace arma;
 
 /*----------------------------------------*/
 /*               The problem              */
@@ -62,6 +62,7 @@ public:
 			const Double & h_max      ,
 			bool                & count_eval   ) const
 	{
+		cout << "Evaluating..." << endl;
 		vector<double> xi;
 		double temp;
 		for(int i=0;i<dim_opca_;i++){
@@ -182,15 +183,12 @@ int main ( int argc , char ** argv ) {
 	// display:
 	Display out ( std::cout );
 	out.precision ( DISPLAY_PRECISION_STD );
-
 	try {
 
 		// NOMAD initializations:
 		begin ( argc , argv );
-
 		// parameters creation:
-		Parameters p ( out );
-
+		Parameters p(out);
 		int dim_opca = 70;
 		int dim_kr   = 6;
 		int dim     = dim_opca + dim_kr;
@@ -204,7 +202,6 @@ int main ( int argc , char ** argv ) {
 		p.set_DISPLAY_STATS ( "bbe obj" );
 
 		p.set_X0 ("ui_start.dat");  // starting point
-
 		p.set_LOWER_BOUND ( Point ( dim , 0.0001 ) ); // all var. >= -6
 		p.set_UPPER_BOUND ( Point ( dim , 0.9999 ) ); // all var. >= -6
 
@@ -240,9 +237,9 @@ int main ( int argc , char ** argv ) {
 		ev.opca_bm_  = GenerateOPCAModel();
 		ev.dim_opca_ = dim_opca;
 		ev.dim_kr_   = dim_kr;
-
 		// algorithm creation and execution:
 		Mads mads ( p , &ev );
+		cout << "10" << endl;
 		mads.run();
 	}
 	catch ( exception & e ) {
