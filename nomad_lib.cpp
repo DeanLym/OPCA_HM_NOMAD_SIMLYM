@@ -62,7 +62,6 @@ public:
 			const Double & h_max      ,
 			bool                & count_eval   ) const
 	{
-		cout << "Evaluating..." << endl;
 		vector<double> xi;
 		double temp;
 		for(int i=0;i<dim_opca_;i++){
@@ -239,7 +238,6 @@ int main ( int argc , char ** argv ) {
 		ev.dim_kr_   = dim_kr;
 		// algorithm creation and execution:
 		Mads mads ( p , &ev );
-		cout << "10" << endl;
 		mads.run();
 	}
 	catch ( exception & e ) {
