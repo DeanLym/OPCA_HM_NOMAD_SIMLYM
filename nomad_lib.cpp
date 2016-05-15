@@ -117,7 +117,7 @@ public:
 
 		sim->display_level_ = 0;
 		sim->RunSim();
-#ifdef DEBUG
+#if defined(DEBUG) || defined(PRED)
 		sim->OutputResult();
 #endif
 		sim->hm_ = new CHistoryMatching;
@@ -154,9 +154,11 @@ public:
 		// Calculate normalized model mismatch + data mismatch
 		double S = 0.5*(Sd+Sm_kr+Sm_xi)/Nd;
 #ifdef DEBUG
-		SaveData("Sd.debug",1,&(Sd));
-		SaveData("Sm_xi.debug",1,&(Sm_xi));
-		SaveData("Sm_kr.debug",1,&(Sm_kr));
+		SaveData("Sd.debug"    , 1         ,&(Sd));
+		SaveData("Sm_xi.debug" , 1         ,&(Sm_xi));
+		SaveData("Sm_kr.debug" , 1         ,&(Sm_kr));
+		SaveData("xi_uc.debug" , dim_opca_ ,&(xi_uc[0]));
+		SaveData("kr_uc.debug" , dim_kr_   ,&(kr_uc[0]));
 #endif
 		x.set_bb_output  ( 0 , S); // objective value
 		count_eval = true; // count a black-box evaluation
@@ -188,32 +190,25 @@ int main ( int argc , char ** argv ) {
 	out.precision ( DISPLAY_PRECISION_STD );
 
 	try {
-		cout << "Begins" << endl;
+//		cout << "Begins" << endl;
 		// NOMAD initializations:
 		begin ( argc , argv );
-		cout << "Begined" << endl;
+//		cout << "Begined" << endl;
 		// parameters creation:
 		Parameters p ( out );
-		cout << "Initialize parameter" << endl;
+//		cout << "Initialize parameter" << endl;
 		int dim_opca = 70;
 		int dim_kr   = 6;
 		int dim     = dim_opca + dim_kr;
 		p.set_DIMENSION (dim);             // number of variables
-		cout << "Set dimension" << endl;
+//		cout << "Set dimension" << endl;
 		vector<bb_output_type> bbot (1); // definition of
 		bbot[0] = OBJ;                   // output types
 		p.set_BB_OUTPUT_TYPE ( bbot );
 
 		//    p.set_DISPLAY_ALL_EVAL(true);   // displays all evaluations.
 		p.set_DISPLAY_STATS ( "bbe obj" );
-		cout << "Set X0" << endl;
-#ifdef DEBUG
-		cout << "Set X0" << endl;
-#endif
-		p.set_X0 ("ui_start.dat");  // starting point
-#ifdef DEBUG
-		cout << "Set X0 finished" << endl;
-#endif
+
 		p.set_LOWER_BOUND ( Point ( dim , 0.0001 ) ); // all var. >= -6
 		p.set_UPPER_BOUND ( Point ( dim , 0.9999 ) ); // all var. >= -6
 
@@ -227,21 +222,66 @@ int main ( int argc , char ** argv ) {
 		p.set_MODEL_SEARCH_OPTIMISTIC(0);
 		p.set_OPPORTUNISTIC_EVAL(0);
 		p.set_SPECULATIVE_SEARCH(0);
-#ifdef DEBUG
+#if defined(DEBUG) || defined(PRED)
 		p.set_MAX_BB_EVAL(1);
 #endif
-#ifndef DEBUG
+#if !defined(DEBUG) && !defined(PRED)
 		p.set_MAX_ITERATIONS (100);     // the algorithm terminates after
 #endif
 		// 100 black-box evaluations
 		p.set_DISPLAY_DEGREE(2);
-#ifndef DEBUG
+#if!defined(DEBUG) && !defined(PRED)
 		p.set_SOLUTION_FILE("solution.txt");
 		p.set_STATS_FILE("stats.txt","eval bbe obj sol");
 #endif
 		p.set_ADD_SEED_TO_FILE_NAMES(0);
 
 		// parameters validation:
+		double temp_data;
+		vector<double> x0,xi_uc,kr_uc;
+		// read unconditional realizations:
+		ifstream ifs;
+		ifs.open("UC_FILE.DATA");
+		string xi_uc_file, kr_uc_file, temp_str;
+		if(ifs.is_open()){
+			ifs >> temp_str >> xi_uc_file;
+			ifs >> temp_str >> kr_uc_file;
+		}
+		ifs.close();
+#ifdef DEBUG
+		cout << xi_uc_file << endl;
+		cout << kr_uc_file << endl;
+#endif
+		ifs.open(xi_uc_file.c_str());
+		for(int i = 0; i < dim_opca; i++){
+			ifs >> temp_data;
+			xi_uc.push_back(temp_data);
+			x0.push_back(temp_data);
+		}
+		ifs.close();
+		// Read kr_uc
+		ifs.open(kr_uc_file.c_str());
+		for(int i = 0; i < dim_kr; i++){
+			ifs >> temp_data;
+			kr_uc.push_back(temp_data);
+			x0.push_back(temp_data);
+		}
+		ifs.close();
+#ifdef DEBUG
+		SaveData("x0.debug",dim,&(x0[0]));
+#endif
+		TranformNormal2Uniform(dim,x0);
+		CheckBound(0.9999,0.0001,dim,x0);
+#ifdef DEBUG
+		SaveData("u0.debug",dim,&(x0[0]));
+#endif
+		SaveData("ui_start.dat",dim,&x0[0]);
+#ifndef PRED
+		p.set_X0 ("ui_start.dat");  // starting point
+#endif
+#ifdef PRED
+		p.set_X0 ("solution.txt");
+#endif
 		p.check();
 #ifdef DEBUG
 		cout << "Generate OPCA Model" << endl;
@@ -251,36 +291,8 @@ int main ( int argc , char ** argv ) {
 		ev.opca_bm_  = GenerateOPCAModel();
 		ev.dim_opca_ = dim_opca;
 		ev.dim_kr_   = dim_kr;
-
-		// read unconditional realizations:
-		ifstream ifs;
-		ifs.open("UC_FILE.DATA");
-		string xi_uc_file, kr_uc_file, temp_str;
-		if(ifs.is_open()){
-			ifs >> temp_str >> xi_uc_file;
-			ifs >> temp_str >> kr_uc_file;
-		}
-#ifdef DEBUG
-		cout << xi_uc_file << endl;
-		cout << kr_uc_file << endl;
-#endif
-		ifs.close();
-		double temp_data;
-		// Read xi_uc
-		ifs.open(xi_uc_file.c_str());
-		for(int i = 0; i < ev.dim_opca_; i++){
-			ifs >> temp_data;
-			ev.xi_uc.push_back(temp_data);
-		}
-		ifs.close();
-		// Read kr_uc
-		ifs.open(kr_uc_file.c_str());
-		for(int i = 0; i < ev.dim_kr_; i++){
-			ifs >> temp_data;
-			ev.kr_uc.push_back(temp_data);
-		}
-		ifs.close();
-
+		ev.xi_uc     = xi_uc;
+		ev.kr_uc     = kr_uc;
 		// algorithm creation and execution:
 		Mads mads ( p , &ev );
 		mads.run();

@@ -31,6 +31,12 @@ void TranformUniform2Normal(int l , vector<double> &m){
 	}
 }
 
+void TranformNormal2Uniform(int l , vector<double> &m){
+	for(int i = 0; i < l ; i++){
+		m[i] = 0.5*(erf(m[i]/1.4142135623)+1);
+	}
+}
+
 double TransformUniform2Normal_2(double u,double mu, double sigma){
 	double x;
 	x = mu + 1.4142135623 * sigma * erf_inv( 2*u - 1 );
@@ -45,7 +51,15 @@ void GeneratePerm(int Nc, double *x, double *perm){
 	}
 }
 
-void SaveData(string fn, int n, double* data){
+void CheckBound(double ub, double lb, int l , vector<double> &m){
+	for(int i=0; i < l ; i++){
+		m[i] = m[i]>ub?ub:m[i];
+		m[i] = m[i]<lb?lb:m[i];
+	}
+}
+
+
+void SaveData(string fn, int n, const double* data){
 	//cout << "Saving data to " << fn << endl;
 	ofstream out;
 	out.open(fn.c_str());
