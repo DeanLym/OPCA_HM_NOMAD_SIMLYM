@@ -64,7 +64,7 @@
 									<listOptionValue builtIn="false" value="/home/yiminliu/nomad.3.6.2/src"/>
 									<listOptionValue builtIn="false" value="/home/yiminliu/openmpi-1.10.2/include"/>
 								</option>
-								<option id="intel.compilestep.coptions.1060342920" name="Additional Options" superClass="intel.compilestep.coptions" value="-DUSE_MPI -DDEBUG" valueType="string"/>
+								<option id="intel.compilestep.coptions.1060342920" name="Additional Options" superClass="intel.compilestep.coptions" value="-DUSE_MPI" valueType="string"/>
 								<inputType id="intel.cpp.compilestep.input.1079464734" superClass="intel.cpp.compilestep.input"/>
 							</tool>
 							<tool command="icc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GmakeErrorParser;org.eclipse.cdt.core.ICCErrorParser" id="intel.c.compilestep.linux.x86_64.exe.dbg.730159819_13.0.0" name="Intel Intel(R) 64 C Compiler" superClass="intel.c.compilestep.linux.x86_64.exe.dbg_13.0.0">
@@ -99,7 +99,7 @@
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
 								</inputType>
-								<outputType id="intel.linkstep.output.834377105" outputPrefix="DBG_" superClass="intel.linkstep.output"/>
+								<outputType id="intel.linkstep.output.834377105" outputPrefix="" superClass="intel.linkstep.output"/>
 							</tool>
 						</toolChain>
 					</folderInfo>

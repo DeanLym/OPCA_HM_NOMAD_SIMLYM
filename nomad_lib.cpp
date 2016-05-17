@@ -85,19 +85,19 @@ public:
 
 		// Prior mean for kr parameters
 		vector<double> kr_avg;
-		kr_avg.push_back(0.16);
-		kr_avg.push_back(0.16);
-		kr_avg.push_back(2.6);
-		kr_avg.push_back(2.4);
-		kr_avg.push_back(0.38);
-		kr_avg.push_back(0.7);
+		kr_avg.push_back(0.35);
+		kr_avg.push_back(0.10);
+		kr_avg.push_back(3.6);
+		kr_avg.push_back(1.5);
+		kr_avg.push_back(0.2);
+		kr_avg.push_back(1.0);
 
 		vector<double> kr_std;
-		kr_std.push_back(0.05);
-		kr_std.push_back(0.05);
-		kr_std.push_back(0.5);
-		kr_std.push_back(0.5);
 		kr_std.push_back(0.1);
+		kr_std.push_back(0.1);
+		kr_std.push_back(1.2);
+		kr_std.push_back(1.2);
+		kr_std.push_back(0.2);
 		kr_std.push_back(0.1);
 
 		for(int i=0; i<dim_kr_; i++){
@@ -105,6 +105,20 @@ public:
 			temp = TransformUniform2Normal_2(temp,kr_avg[i],kr_std[i]);
 			kr.push_back(temp);
 		}
+		// Boundary check
+		kr[0] = kr[0]<0?0.01:kr[0];
+		kr[1] = kr[1]<0?0.01:kr[1];
+		kr[2] = kr[2]<1?1.0:kr[2];
+		kr[3] = kr[3]<1?1.0:kr[3];
+		kr[4] = kr[4]<0?0.01:kr[4];
+		kr[4] = kr[4]>1?1:kr[4];
+		if(kr[0]+kr[1]>1.0){
+			x.set_bb_output  ( 0 , 1e20); // objective value
+			count_eval = true; // count a black-box evaluation
+			cout << "Sum of krw0 and kro0 bigger than 1." << endl;
+			return true;       // the evaluation succeeded
+		}
+
 
 #ifdef DEBUG
 		SaveData("xi.debug",dim_opca_,&(xi[0]));
@@ -215,6 +229,8 @@ int main ( int argc , char ** argv ) {
 		p.set_INITIAL_MESH_SIZE(0.2);
 		p.set_SNAP_TO_BOUNDS(0);
 		p.set_DIRECTION_TYPE(NOMAD::ORTHO_2N);
+		p.set_MESH_COARSENING_EXPONENT(0);
+
 
 		p.set_MODEL_SEARCH(0);
 		p.set_ASYNCHRONOUS(0);
@@ -282,6 +298,7 @@ int main ( int argc , char ** argv ) {
 #ifdef PRED
 		p.set_X0 ("solution.txt");
 #endif
+		p.set_FIXED_VARIABLE(75); // Fix kro_star
 		p.check();
 #ifdef DEBUG
 		cout << "Generate OPCA Model" << endl;
