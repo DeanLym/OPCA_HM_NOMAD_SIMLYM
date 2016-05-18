@@ -84,21 +84,6 @@ public:
 		vector<double> kr;
 
 		// Prior mean for kr parameters
-		vector<double> kr_avg;
-		kr_avg.push_back(0.35);
-		kr_avg.push_back(0.10);
-		kr_avg.push_back(3.6);
-		kr_avg.push_back(1.5);
-		kr_avg.push_back(0.2);
-		kr_avg.push_back(1.0);
-
-		vector<double> kr_std;
-		kr_std.push_back(0.1);
-		kr_std.push_back(0.1);
-		kr_std.push_back(1.2);
-		kr_std.push_back(1.2);
-		kr_std.push_back(0.2);
-		kr_std.push_back(0.1);
 
 		for(int i=0; i<dim_kr_; i++){
 			temp = x[i+dim_opca_].value();
@@ -186,6 +171,8 @@ public:
 	int 	      dim_kr_;
 	vector<double> xi_uc;
 	vector<double> kr_uc;
+	vector<double> kr_avg;
+	vector<double> kr_std;
 };
 
 
@@ -248,7 +235,7 @@ int main ( int argc , char ** argv ) {
 		p.set_DISPLAY_DEGREE(2);
 #if!defined(DEBUG) && !defined(PRED)
 		p.set_SOLUTION_FILE("solution.txt");
-		p.set_STATS_FILE("stats.txt","eval bbe obj sol");
+		p.set_STATS_FILE("stats.txt","eval bbe obj sol poll_size");
 #endif
 		p.set_ADD_SEED_TO_FILE_NAMES(0);
 
@@ -283,6 +270,18 @@ int main ( int argc , char ** argv ) {
 			x0.push_back(temp_data);
 		}
 		ifs.close();
+		// Read kr_avg and kr_std
+		vector<double> kr_avg, kr_std;
+		ifs.open("KR_PRIOR.DATA");
+		for(int i = 0; i < dim_kr; i++){
+			ifs >> temp_data;
+			kr_avg.push_back(temp_data);
+		}
+		for(int i = 0; i < dim_kr; i++){
+			ifs >> temp_data;
+			kr_std.push_back(temp_data);
+		}
+		ifs.close();
 #ifdef DEBUG
 		SaveData("x0.debug",dim,&(x0[0]));
 #endif
@@ -298,6 +297,8 @@ int main ( int argc , char ** argv ) {
 #ifdef PRED
 		p.set_X0 ("solution.txt");
 #endif
+		p.set_FIXED_VARIABLE(70); // Fix swi
+		p.set_FIXED_VARIABLE(71); // Fix sor
 		p.set_FIXED_VARIABLE(75); // Fix kro_star
 		p.check();
 #ifdef DEBUG
@@ -310,6 +311,8 @@ int main ( int argc , char ** argv ) {
 		ev.dim_kr_   = dim_kr;
 		ev.xi_uc     = xi_uc;
 		ev.kr_uc     = kr_uc;
+		ev.kr_avg    = kr_avg;
+		ev.kr_std    = kr_std;
 		// algorithm creation and execution:
 		Mads mads ( p , &ev );
 		mads.run();

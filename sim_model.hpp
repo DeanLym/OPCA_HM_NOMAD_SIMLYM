@@ -43,12 +43,14 @@ SimCtrl* GetSimulationModel(double *kx, vector<double> kr){
 
 	// initialize SCH
 	sim->sch_ = new CSchedule;
-#ifdef PRED
+
+#if defined(DEBUG) || defined(PRED)
 	sim->sch_->SetTEnd(2000.0);
 #endif
-#ifndef PRED
-	sim->sch_->SetTEnd(1000.0);
+#if !defined(DEBUG) && !defined(PRED)
+	sim->sch_->SetTEnd(1000.0);     // the algorithm terminates after
 #endif
+
 	sim->sch_->SetTCurrent(0.0);
 	sim->sch_->SetTNext(sim->sch_->GetDt() + sim->sch_->GetTCurrent());
 	sim->sch_->SetdTmax(100.0);
