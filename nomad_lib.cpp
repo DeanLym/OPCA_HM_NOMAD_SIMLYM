@@ -20,17 +20,31 @@ using namespace NOMAD; //avoids putting  everywhere
 class My_Evaluator : public Evaluator {
 public:
 	My_Evaluator  ( const Parameters & p ) :
-		Evaluator ( p ) {
+		Evaluator           ( p                                 ) ,
+		_mesh_update_basis  ( p.get_mesh_update_basis().value() ) ,
+		_initial_mesh_index ( p.get_initial_mesh_index()        ) ,
+		_mesh_index         ( _initial_mesh_index               ) ,
+		_initial_mesh_size  ( p.get_initial_mesh_size()         )
+{
 		opca_bm_  = new OPCA_BIMODAL(1,1,1,1);
 		dim_opca_ = 1;
 		dim_kr_   = 1;
-	}
+}
 
 	~My_Evaluator ( void ) {
 		delete opca_bm_;
 	}
 
+	int get_mesh_index ( void ) const { return _mesh_index; }
 
+	void get_mesh_size ( Point & mesh_size ) const
+	{
+		Mesh::get_delta_m ( mesh_size           ,
+				_initial_mesh_size  ,
+				_mesh_update_basis  ,
+				_initial_mesh_index ,
+				_mesh_index           );
+	}
 
 	void update_iteration	(	NOMAD::success_type 	success,
 			const NOMAD::Stats & 	stats,
@@ -57,6 +71,8 @@ public:
 		ofs.open("iter.txt",std::ofstream::out | std::ofstream::app);
 		ofs << num_iter << "\t" << num_eval << "\t" << real_time << endl;
 		ofs.close();
+
+		_mesh_index = Mesh::get_mesh_index();
 
 	}
 
@@ -173,6 +189,10 @@ public:
 	vector<double> kr_uc;
 	vector<double> kr_avg;
 	vector<double> kr_std;
+	double _mesh_update_basis;
+	int    _initial_mesh_index;
+	int    _mesh_index;
+	Point  _initial_mesh_size;
 };
 
 
@@ -191,18 +211,18 @@ int main ( int argc , char ** argv ) {
 	out.precision ( DISPLAY_PRECISION_STD );
 
 	try {
-//		cout << "Begins" << endl;
+		//		cout << "Begins" << endl;
 		// NOMAD initializations:
 		begin ( argc , argv );
-//		cout << "Begined" << endl;
+		//		cout << "Begined" << endl;
 		// parameters creation:
 		Parameters p ( out );
-//		cout << "Initialize parameter" << endl;
+		//		cout << "Initialize parameter" << endl;
 		int dim_opca = 70;
 		int dim_kr   = 6;
 		int dim     = dim_opca + dim_kr;
 		p.set_DIMENSION (dim);             // number of variables
-//		cout << "Set dimension" << endl;
+		//		cout << "Set dimension" << endl;
 		vector<bb_output_type> bbot (1); // definition of
 		bbot[0] = OBJ;                   // output types
 		p.set_BB_OUTPUT_TYPE ( bbot );
@@ -226,16 +246,20 @@ int main ( int argc , char ** argv ) {
 		p.set_OPPORTUNISTIC_EVAL(0);
 		p.set_SPECULATIVE_SEARCH(0);
 #if defined(DEBUG) || defined(PRED)
-		p.set_MAX_BB_EVAL(1);
+		p.set_MAX_BB_EVAL(2);
 #endif
 #if !defined(DEBUG) && !defined(PRED)
-		p.set_MAX_ITERATIONS (100);     // the algorithm terminates after
+		p.set_MAX_ITERATIONS (80);     // the algorithm terminates after
 #endif
 		// 100 black-box evaluations
 		p.set_DISPLAY_DEGREE(2);
 #if!defined(DEBUG) && !defined(PRED)
-		p.set_SOLUTION_FILE("solution.txt");
-		p.set_STATS_FILE("stats.txt","eval bbe obj sol poll_size");
+		p.set_SOLUTION_FILE("solution1.txt");
+		p.set_STATS_FILE("stats1.txt","eval bbe obj sol poll_size mesh_size");
+#endif
+#ifdef DEBUG
+		p.set_SOLUTION_FILE("dbg_solution1.txt");
+		p.set_STATS_FILE("dbg_stats1.txt","eval bbe obj sol poll_size mesh_size");
 #endif
 		p.set_ADD_SEED_TO_FILE_NAMES(0);
 
@@ -295,7 +319,7 @@ int main ( int argc , char ** argv ) {
 		p.set_X0 ("ui_start.dat");  // starting point
 #endif
 #ifdef PRED
-		p.set_X0 ("solution.txt");
+		p.set_X0 ("solution1.txt");
 #endif
 		p.set_FIXED_VARIABLE(70); // Fix swi
 		p.set_FIXED_VARIABLE(71); // Fix sor
@@ -315,7 +339,46 @@ int main ( int argc , char ** argv ) {
 		ev.kr_std    = kr_std;
 		// algorithm creation and execution:
 		Mads mads ( p , &ev );
-		mads.run();
+
+	    // best solutions:
+		// successive runs:
+		for ( int i = 0 ; i < 2; ++i ) {
+
+			// not for the first run:
+			if ( i > 0 )
+			{
+				// new starting points:
+				p.reset_X0();
+				/*
+				string init_file = "solution";
+				string sln_file  = "solution";
+				string num;
+				stringstream ss;
+				ss << i;
+				ss >> num;
+				sln_file = sln_file + num + ".txt";
+				*/
+				p.set_X0 ( "solution1.txt" );
+				p.set_SOLUTION_FILE("solution2.txt");
+				p.set_STATS_FILE("stats2.txt","eval bbe obj sol poll_size mesh_size");
+				// initial mesh:
+				p.set_INITIAL_MESH_INDEX ( ev.get_mesh_index() );
+				Point initial_mesh_size;
+				ev.get_mesh_size ( initial_mesh_size );
+				p.set_INITIAL_MESH_SIZE ( initial_mesh_size );
+				for(int j=0;j<70;j++)
+					p.set_FIXED_VARIABLE(j); // Fix O-PCA variable
+				p.set_MAX_ITERATIONS (20);     // the algorithm terminates after
+				// parameters validation:
+				p.check();
+
+				// reset the Mads object:
+				mads.reset ( true , true );
+			}
+			// the run:
+			mads.run();
+			//cout << "run #" << i << endl;
+		}
 	}
 	catch ( exception & e ) {
 		cerr << "\nNOMAD has been interrupted (" << e.what() << ")\n\n";
