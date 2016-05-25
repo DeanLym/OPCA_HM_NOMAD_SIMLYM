@@ -58,6 +58,14 @@ void CheckBound(double ub, double lb, int l , vector<double> &m){
 	}
 }
 
+string num2str(int x){
+	stringstream ss;
+	string res;
+	ss << x;
+	ss >> res;
+	return res;
+}
+
 
 void SaveData(string fn, int n, const double* data){
 	//cout << "Saving data to " << fn << endl;

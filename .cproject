@@ -50,7 +50,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="" artifactName="OPCA_KR_HM_RML" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.GmakeErrorParser;org.eclipse.cdt.core.ICCErrorParser" id="intel.linux.x86_64.exe.dbg.1016410266_13.0.0" name="Debug" parent="intel.linux.x86_64.exe.dbg_13.0.0" postannouncebuildStep="" postbuildStep="" preannouncebuildStep="" prebuildStep="">
+				<configuration artifactExtension="" artifactName="OPCA_HM_ML_RML" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.GmakeErrorParser;org.eclipse.cdt.core.ICCErrorParser" id="intel.linux.x86_64.exe.dbg.1016410266_13.0.0" name="Debug" parent="intel.linux.x86_64.exe.dbg_13.0.0" postannouncebuildStep="" postbuildStep="" preannouncebuildStep="" prebuildStep="">
 					<folderInfo id="intel.linux.x86_64.exe.dbg.1016410266._13.0.0" name="/" resourcePath="">
 						<toolChain errorParsers="" id="intel.toolchain.linux.x86_64.exe.dbg.1889806919_13.0.0" name="Intel Toolchain for Executable on Intel(R) 64" superClass="intel.toolchain.linux.x86_64.exe.dbg_13.0.0">
 							<targetPlatform archList="x86_64" binaryParser="org.eclipse.cdt.core.ELF" id="intel.platform.linux.x86_64.exe.dbg_13.0.0.778240509" name="Platform.Executable.Debug" osList="linux" superClass="intel.platform.linux.x86_64.exe.dbg_13.0.0"/>
@@ -64,7 +64,7 @@
 									<listOptionValue builtIn="false" value="/home/yiminliu/nomad.3.6.2/src"/>
 									<listOptionValue builtIn="false" value="/home/yiminliu/openmpi-1.10.2/include"/>
 								</option>
-								<option id="intel.compilestep.coptions.1060342920" name="Additional Options" superClass="intel.compilestep.coptions" value="-DUSE_MPI" valueType="string"/>
+								<option id="intel.compilestep.coptions.1060342920" name="Additional Options" superClass="intel.compilestep.coptions" value="-DUSE_MPI -DDEBUG" valueType="string"/>
 								<inputType id="intel.cpp.compilestep.input.1079464734" superClass="intel.cpp.compilestep.input"/>
 							</tool>
 							<tool command="icc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GmakeErrorParser;org.eclipse.cdt.core.ICCErrorParser" id="intel.c.compilestep.linux.x86_64.exe.dbg.730159819_13.0.0" name="Intel Intel(R) 64 C Compiler" superClass="intel.c.compilestep.linux.x86_64.exe.dbg_13.0.0">
@@ -99,7 +99,7 @@
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
 								</inputType>
-								<outputType id="intel.linkstep.output.834377105" outputPrefix="" superClass="intel.linkstep.output"/>
+								<outputType id="intel.linkstep.output.834377105" outputPrefix="DBG_" superClass="intel.linkstep.output"/>
 							</tool>
 						</toolChain>
 					</folderInfo>
