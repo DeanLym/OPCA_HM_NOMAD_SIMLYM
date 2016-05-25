@@ -209,6 +209,9 @@ int main ( int argc , char ** argv ) {
 	// display:
 	Display out ( std::cout );
 	out.precision ( DISPLAY_PRECISION_STD );
+	int starting_level = 0;
+	if(argc >=2)
+		starting_level= char2num(argv[1]);
 
 	try {
 		//		cout << "Begins" << endl;
@@ -254,8 +257,11 @@ int main ( int argc , char ** argv ) {
 		// 100 black-box evaluations
 		p.set_DISPLAY_DEGREE(2);
 #if!defined(DEBUG) && !defined(PRED)
-		p.set_SOLUTION_FILE("solution1.txt");
-		p.set_STATS_FILE("stats1.txt","eval bbe obj sol poll_size mesh_size");
+		if(starting_level>0){
+			p.set_SOLUTION_FILE("solution1.txt");
+			p.set_STATS_FILE("stats1.txt","eval bbe obj sol poll_size mesh_size");
+		}
+
 #endif
 #ifdef DEBUG
 		p.set_SOLUTION_FILE("dbg_solution1.txt");
@@ -339,13 +345,12 @@ int main ( int argc , char ** argv ) {
 		ev.kr_std    = kr_std;
 		// algorithm creation and execution:
 		Mads mads ( p , &ev );
-
 	    // best solutions:
 		// successive runs:
-		for ( int i = 0 ; i < 2; ++i ) {
+//		for ( int i = starting_level ; i < 2; ++i ) {
 
 			// not for the first run:
-			if ( i > 0 )
+			if ( starting_level > 0 )
 			{
 				// new starting points:
 				p.reset_X0();
@@ -365,9 +370,11 @@ int main ( int argc , char ** argv ) {
 				p.set_INITIAL_MESH_INDEX ( ev.get_mesh_index() );
 				Point initial_mesh_size;
 				ev.get_mesh_size ( initial_mesh_size );
+
 				p.set_INITIAL_MESH_SIZE ( initial_mesh_size );
 				for(int j=0;j<70;j++)
 					p.set_FIXED_VARIABLE(j); // Fix O-PCA variable
+
 				p.set_MAX_ITERATIONS (20);     // the algorithm terminates after
 				// parameters validation:
 				p.check();
@@ -378,7 +385,7 @@ int main ( int argc , char ** argv ) {
 			// the run:
 			mads.run();
 			//cout << "run #" << i << endl;
-		}
+//		}
 	}
 	catch ( exception & e ) {
 		cerr << "\nNOMAD has been interrupted (" << e.what() << ")\n\n";
