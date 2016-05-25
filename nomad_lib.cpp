@@ -257,7 +257,7 @@ int main ( int argc , char ** argv ) {
 		// 100 black-box evaluations
 		p.set_DISPLAY_DEGREE(2);
 #if!defined(DEBUG) && !defined(PRED)
-		if(starting_level>0){
+		if(starting_level==0){
 			p.set_SOLUTION_FILE("solution1.txt");
 			p.set_STATS_FILE("stats1.txt","eval bbe obj sol poll_size mesh_size");
 		}
