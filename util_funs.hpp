@@ -66,6 +66,23 @@ string num2str(int x){
 	return res;
 }
 
+int str2num(string x){
+	stringstream ss;
+	int res;
+	ss << x;
+	ss >> res;
+	return res;
+}
+
+int char2num(char* x){
+	string y(x);
+	stringstream ss;
+	int res;
+	ss << y;
+	ss >> res;
+	return res;
+}
+
 
 void SaveData(string fn, int n, const double* data){
 	//cout << "Saving data to " << fn << endl;

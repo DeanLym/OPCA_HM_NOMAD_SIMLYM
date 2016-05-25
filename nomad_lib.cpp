@@ -173,6 +173,9 @@ int main ( int argc , char ** argv ) {
 	// display:
 	Display out ( std::cout );
 	out.precision ( DISPLAY_PRECISION_STD );
+	int current_level = 0; //Default level is 0
+	if(argc > 1)
+		current_level = char2num(argv[1]);
 
 	try {
 		//		cout << "Begins" << endl;
@@ -182,7 +185,50 @@ int main ( int argc , char ** argv ) {
 		// parameters creation:
 		Parameters p ( out );
 		//		cout << "Initialize parameter" << endl;
-		int dim = 80 , l1 = 25, iter_each_level = 25, num_level = 4;
+		int dim = 80;
+		//===========================================================//
+		// Read parameters from file
+		double temp_data;
+		vector<double> x0,xi_uc,kr_uc;
+		// read unconditional realizations:
+		int num_level = 4;
+		vector<int> ml_dims;
+		vector<int> ml_iters;
+		ifstream ifs;
+		// Read multilevel dimensions
+		ifs.open("ML.DATA");
+		ifs >> num_level;
+		ml_dims.resize(num_level);
+		ml_iters.resize(num_level);
+		for(int i=0;i<num_level;i++){
+			ifs>>ml_dims[i];
+			ifs>>ml_iters[i];
+		}
+		ifs.close();
+
+		// Read uc file path
+		ifs.open("UC_FILE.DATA");
+		string xi_uc_file, temp_str;
+		if(ifs.is_open()){
+			ifs >> temp_str >> xi_uc_file;
+		}
+		ifs.close();
+#ifdef DEBUG
+		cout << xi_uc_file << endl;
+#endif
+		ifs.open(xi_uc_file.c_str());
+		for(int i = 0; i < dim; i++){
+			ifs >> temp_data;
+			xi_uc.push_back(temp_data);
+			if(i < ml_dims[0])
+			    x0.push_back(temp_data);
+			else
+				x0.push_back(0);
+		}
+		ifs.close();
+
+		//===========================================================//
+
 		p.set_DIMENSION (dim);             // number of variables
 		//		cout << "Set dimension" << endl;
 		vector<bb_output_type> bbot (1); // definition of
@@ -210,10 +256,11 @@ int main ( int argc , char ** argv ) {
 		p.set_MAX_BB_EVAL(2);
 #endif
 #if !defined(DEBUG) && !defined(PRED)
-		p.set_MAX_ITERATIONS (iter_each_level);     // the algorithm terminates after
+		p.set_MAX_ITERATIONS (ml_iters[0]);     // the algorithm terminates after
 #endif
 		// 100 black-box evaluations
 		p.set_DISPLAY_DEGREE(2);
+		if(current_level==0){
 #if!defined(DEBUG) && !defined(PRED)
 		p.set_SOLUTION_FILE("solution1.txt");
 		p.set_STATS_FILE("stats1.txt","eval bbe obj sol poll_size mesh_size");
@@ -222,32 +269,10 @@ int main ( int argc , char ** argv ) {
 		p.set_SOLUTION_FILE("dbg_solution1.txt");
 		p.set_STATS_FILE("dbg_stats1.txt","eval bbe obj sol poll_size mesh_size");
 #endif
+		}
 		p.set_ADD_SEED_TO_FILE_NAMES(0);
 
-		// parameters validation:
-		double temp_data;
-		vector<double> x0,xi_uc,kr_uc;
-		// read unconditional realizations:
-		ifstream ifs;
-		ifs.open("UC_FILE.DATA");
-		string xi_uc_file, temp_str;
-		if(ifs.is_open()){
-			ifs >> temp_str >> xi_uc_file;
-		}
-		ifs.close();
-#ifdef DEBUG
-		cout << xi_uc_file << endl;
-#endif
-		ifs.open(xi_uc_file.c_str());
-		for(int i = 0; i < dim; i++){
-			ifs >> temp_data;
-			xi_uc.push_back(temp_data);
-			if(i < l1)
-			    x0.push_back(temp_data);
-			else
-				x0.push_back(0);
-		}
-		ifs.close();
+
 #ifdef DEBUG
 		SaveData("x0.debug",dim,&(x0[0]));
 #endif
@@ -263,7 +288,7 @@ int main ( int argc , char ** argv ) {
 #ifdef PRED
 		p.set_X0 ("solution4.txt");
 #endif
-		for(int i=l1;i<dim;i++)
+		for(int i=ml_dims[0];i<dim;i++)
 			p.set_FIXED_VARIABLE(i); // Fix swi
 		p.check();
 #ifdef DEBUG
@@ -279,40 +304,38 @@ int main ( int argc , char ** argv ) {
 
 	    // best solutions:
 		// successive runs:
-		for ( int i = 0 ; i < num_level; ++i ) {
-			// not for the first run:
-			if ( i > 0 )
-			{
-				// new starting points:
-				p.reset_X0();
-				string init_file   = "solution" + num2str(i-1) + ".txt";
-				string sln_file    = "solution" + num2str(i)   + ".txt";
-				string stats_file  = "stats"    + num2str(i)   + ".txt";
-				p.set_X0 ( init_file.c_str() );
-				p.set_SOLUTION_FILE(sln_file.c_str());
-				p.set_STATS_FILE(stats_file.c_str(),"eval bbe obj sol poll_size mesh_size");
-				// initial mesh:
-				p.set_INITIAL_MESH_INDEX ( ev.get_mesh_index() );
-				Point initial_mesh_size;
-				ev.get_mesh_size ( initial_mesh_size );
-				p.set_INITIAL_MESH_SIZE ( initial_mesh_size );
-				for(int j=0;j<i*l1;j++)
-					p.set_FIXED_VARIABLE(j); // Fix O-PCA variable
-				for(int j=i*l1;j<(i+1)*l1;j++)
-					p.set_FREE_VARIABLE(j);
-				for(int j=(i+1)*l1;j<dim;j++)
-					p.set_FIXED_VARIABLE(j);
-				p.set_MAX_ITERATIONS (iter_each_level);     // the algorithm terminates after
-				// parameters validation:
-				p.check();
+		int i = current_level;
+		if ( i > 0 )
+		{
+			// new starting points:
+			p.reset_X0();
+			string init_file   = "solution" + num2str(i-1) + ".txt";
+			string sln_file    = "solution" + num2str(i)   + ".txt";
+			string stats_file  = "stats"    + num2str(i)   + ".txt";
+			p.set_X0 ( init_file.c_str() );
+			p.set_SOLUTION_FILE(sln_file.c_str());
+			p.set_STATS_FILE(stats_file.c_str(),"eval bbe obj sol poll_size mesh_size");
+			// initial mesh:
+			p.set_INITIAL_MESH_INDEX ( ev.get_mesh_index() );
+			Point initial_mesh_size;
+			ev.get_mesh_size ( initial_mesh_size );
+			p.set_INITIAL_MESH_SIZE ( initial_mesh_size );
+			for(int j=0;j<ml_dims[i-1];j++)
+				p.set_FIXED_VARIABLE(j); // Fix O-PCA variable
+			for(int j=ml_dims[i-1];j<ml_dims[i];j++)
+				p.set_FREE_VARIABLE(j);
+			for(int j=ml_dims[i];j<dim;j++)
+				p.set_FIXED_VARIABLE(j);
+			p.set_MAX_ITERATIONS (ml_iters[i]);     // the algorithm terminates after
+			// parameters validation:
+			p.check();
 
-				// reset the Mads object:
-				mads.reset ( true , true );
-			}
-			// the run:
-			mads.run();
-			//cout << "run #" << i << endl;
+			// reset the Mads object:
+			mads.reset ( true , true );
 		}
+		// the run:
+		mads.run();
+		//cout << "run #" << i << endl;
 	}
 	catch ( exception & e ) {
 		cerr << "\nNOMAD has been interrupted (" << e.what() << ")\n\n";
