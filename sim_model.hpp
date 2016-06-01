@@ -45,14 +45,14 @@ SimCtrl* GetSimulationModel(double *kx){
 	sim->sch_->SetTEnd(2000.0);
 #endif
 #if !defined(DEBUG) && !defined(PRED)
-	sim->sch_->SetTEnd(1000.0);     // the algorithm terminates after
+	sim->sch_->SetTEnd(600.0);     // the algorithm terminates after
 #endif
 
 	sim->sch_->SetTCurrent(0.0);
 	sim->sch_->SetTNext(sim->sch_->GetDt() + sim->sch_->GetTCurrent());
 	sim->sch_->SetdTmax(100.0);
 	vector<double> report_time;
-	int num_report_time = 10;
+	int num_report_time = 6;
 #ifdef PRED
 	num_report_time = 20;
 #endif

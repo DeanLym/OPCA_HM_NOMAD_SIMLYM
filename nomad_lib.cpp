@@ -173,10 +173,13 @@ int main ( int argc , char ** argv ) {
 	// display:
 	Display out ( std::cout );
 	out.precision ( DISPLAY_PRECISION_STD );
+	int dim = 80;
 	int current_level = 0; //Default level is 0
+	int force_init_zero = dim;
 	if(argc > 1)
 		current_level = char2num(argv[1]);
-
+	if(argc > 2)
+		force_init_zero = char2num(argv[2]);
 	try {
 		//		cout << "Begins" << endl;
 		// NOMAD initializations:
@@ -185,7 +188,8 @@ int main ( int argc , char ** argv ) {
 		// parameters creation:
 		Parameters p ( out );
 		//		cout << "Initialize parameter" << endl;
-		int dim = 80;
+
+
 		//===========================================================//
 		// Read parameters from file
 		double temp_data;
@@ -220,7 +224,7 @@ int main ( int argc , char ** argv ) {
 		for(int i = 0; i < dim; i++){
 			ifs >> temp_data;
 			xi_uc.push_back(temp_data);
-			if(i < ml_dims[0])
+			if(i<force_init_zero)
 			    x0.push_back(temp_data);
 			else
 				x0.push_back(0);
@@ -266,8 +270,8 @@ int main ( int argc , char ** argv ) {
 		p.set_STATS_FILE("stats1.txt","eval bbe obj sol poll_size mesh_size");
 #endif
 #ifdef DEBUG
-		p.set_SOLUTION_FILE("dbg_solution1.txt");
-		p.set_STATS_FILE("dbg_stats1.txt","eval bbe obj sol poll_size mesh_size");
+		p.set_SOLUTION_FILE("solution1.txt");
+		p.set_STATS_FILE("stats1.txt","eval bbe obj sol poll_size mesh_size");
 #endif
 		}
 		p.set_ADD_SEED_TO_FILE_NAMES(0);
@@ -309,21 +313,21 @@ int main ( int argc , char ** argv ) {
 		{
 			// new starting points:
 			p.reset_X0();
-			string init_file   = "solution" + num2str(i-1) + ".txt";
-			string sln_file    = "solution" + num2str(i)   + ".txt";
-			string stats_file  = "stats"    + num2str(i)   + ".txt";
+			string init_file   = "solution" + num2str(i) + ".txt";
+			string sln_file    = "solution" + num2str(i+1)   + ".txt";
+			string stats_file  = "stats"    + num2str(i+1)   + ".txt";
 			p.set_X0 ( init_file.c_str() );
 			p.set_SOLUTION_FILE(sln_file.c_str());
 			p.set_STATS_FILE(stats_file.c_str(),"eval bbe obj sol poll_size mesh_size");
 			// initial mesh:
-			p.set_INITIAL_MESH_INDEX ( ev.get_mesh_index() );
-			Point initial_mesh_size;
-			ev.get_mesh_size ( initial_mesh_size );
-			p.set_INITIAL_MESH_SIZE ( initial_mesh_size );
-			for(int j=0;j<ml_dims[i-1];j++)
-				p.set_FIXED_VARIABLE(j); // Fix O-PCA variable
+			//p.set_INITIAL_MESH_INDEX ( ev.get_mesh_index() );
+			//Point initial_mesh_size;
+			//ev.get_mesh_size ( initial_mesh_size );
+			//p.set_INITIAL_MESH_SIZE ( initial_mesh_size );
 			for(int j=ml_dims[i-1];j<ml_dims[i];j++)
 				p.set_FREE_VARIABLE(j);
+			for(int j=0;j<ml_dims[i-1];j++)
+				p.set_FIXED_VARIABLE(j); // Fix O-PCA variable
 			for(int j=ml_dims[i];j<dim;j++)
 				p.set_FIXED_VARIABLE(j);
 			p.set_MAX_ITERATIONS (ml_iters[i]);     // the algorithm terminates after
