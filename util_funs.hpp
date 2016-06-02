@@ -83,6 +83,21 @@ int char2num(char* x){
 	return res;
 }
 
+void ReadData(string fn, int n, Double* data){
+	//cout << "Saving data to " << fn << endl;
+	ifstream in;
+	in.open(fn.c_str());
+
+	if (in.is_open()){
+		for (int i = 0; i < n; i++){
+			in >> data[i];
+		}
+		in.close();
+	}else{
+		throw runtime_error("Can not write file while saving data.");
+	}
+}
+
 
 void SaveData(string fn, int n, const double* data){
 	//cout << "Saving data to " << fn << endl;

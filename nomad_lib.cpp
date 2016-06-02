@@ -10,6 +10,7 @@ using namespace NOMAD; //avoids putting  everywhere
 #include "sim_model.hpp"
 #include "generate_opca_model.hpp"
 #include "util_funs.hpp"
+#include <mpi.h>
 // #include <armadillo>
 
 // using namespace arma;
@@ -105,7 +106,9 @@ public:
 		SimCtrl* sim = GetSimulationModel(&perm[0]);
 
 		sim->display_level_ = 0;
+		//cout << "Begin to run simulation." <<endl;
 		sim->RunSim();
+		//cout << "Finished running simulation." << endl;
 #if defined(DEBUG) || defined(PRED)
 		sim->OutputResult();
 #endif
@@ -122,9 +125,10 @@ public:
 		in.close();
 		//		cout << hist_file << endl;
 		sim->hm_->SetHMTarget(hist_file.c_str());
+		//cout << "Finished setting history matching target." << endl;
 		//		cout << "Set history matching target..." << endl;
 		double Sd = sim->hm_->GetDataMismatch(sim->std_well_);
-
+		//cout << "Finished calculating data mismatch" << endl;
 		// Read number of data points
 		double Nd = 1.0;
 		ifstream ifs;
@@ -145,8 +149,9 @@ public:
 #endif
 		x.set_bb_output  ( 0 , S); // objective value
 		count_eval = true; // count a black-box evaluation
-
+		//cout << "Delete sim object." << endl;
 		delete sim;
+		//cout << "Finished evaluation!" << endl;
 		return true;       // the evaluation succeeded
 	}
 public:
@@ -181,14 +186,15 @@ int main ( int argc , char ** argv ) {
 	if(argc > 2)
 		force_init_zero = char2num(argv[2]);
 	try {
-		//		cout << "Begins" << endl;
 		// NOMAD initializations:
 		begin ( argc , argv );
-		//		cout << "Begined" << endl;
 		// parameters creation:
-		Parameters p ( out );
-		//		cout << "Initialize parameter" << endl;
+		int size, rank;
+		MPI_Comm_size(MPI_COMM_WORLD, &size);
+		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+		//cout << "This is proc #" << world_rank << "in all " << world_size << " procs" << endl;
 
+		Parameters p ( out );
 
 		//===========================================================//
 		// Read parameters from file
@@ -285,7 +291,10 @@ int main ( int argc , char ** argv ) {
 #ifdef DEBUG
 		SaveData("u0.debug",dim,&(x0[0]));
 #endif
-		SaveData("ui_start1.dat",dim,&x0[0]);
+		if( rank == 0)
+			SaveData("ui_start1.dat",dim,&x0[0]);
+		MPI_Barrier( MPI_COMM_WORLD );
+
 #ifndef PRED
 		p.set_X0 ("ui_start1.dat");  // starting point
 #endif
@@ -316,7 +325,9 @@ int main ( int argc , char ** argv ) {
 			string init_file   = "solution" + num2str(i) + ".txt";
 			string sln_file    = "solution" + num2str(i+1)   + ".txt";
 			string stats_file  = "stats"    + num2str(i+1)   + ".txt";
+			MPI_Barrier( MPI_COMM_WORLD ) ;
 			p.set_X0 ( init_file.c_str() );
+
 			p.set_SOLUTION_FILE(sln_file.c_str());
 			p.set_STATS_FILE(stats_file.c_str(),"eval bbe obj sol poll_size mesh_size");
 			// initial mesh:
@@ -337,6 +348,8 @@ int main ( int argc , char ** argv ) {
 			// reset the Mads object:
 			mads.reset ( true , true );
 		}
+		//cout << "Current level is :" << current_level << endl;
+		//cout << "Begin to run MADS." << endl;
 		// the run:
 		mads.run();
 		//cout << "run #" << i << endl;
