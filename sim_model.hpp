@@ -52,8 +52,11 @@ SimCtrl* GetSimulationModel(double *kx){
 	sim->sch_->SetTNext(sim->sch_->GetDt() + sim->sch_->GetTCurrent());
 	sim->sch_->SetdTmax(100.0);
 	vector<double> report_time;
-	int num_report_time = 6;
-#ifdef PRED
+	int num_report_time = 1;
+#if !defined(DEBUG) && !defined(PRED)
+	num_report_time = 6;
+#endif
+#if defined(DEBUG) || defined(PRED)
 	num_report_time = 20;
 #endif
 	for(int i=0; i<num_report_time ;i++)

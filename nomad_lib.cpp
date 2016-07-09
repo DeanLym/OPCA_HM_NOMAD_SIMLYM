@@ -162,6 +162,7 @@ public:
 	int    _initial_mesh_index;
 	int    _mesh_index;
 	Point  _initial_mesh_size;
+
 };
 
 
@@ -224,7 +225,7 @@ int main ( int argc , char ** argv ) {
 		}
 		ifs.close();
 #ifdef DEBUG
-		cout << xi_uc_file << endl;
+		//cout << xi_uc_file << endl;
 #endif
 		ifs.open(xi_uc_file.c_str());
 		for(int i = 0; i < dim; i++){
@@ -263,7 +264,8 @@ int main ( int argc , char ** argv ) {
 		p.set_OPPORTUNISTIC_EVAL(0);
 		p.set_SPECULATIVE_SEARCH(0);
 #if defined(DEBUG) || defined(PRED)
-		p.set_MAX_BB_EVAL(2);
+		//p.set_MAX_BB_EVAL(1);
+		p.set_MAX_ITERATIONS (ml_iters[0]);     // the algorithm terminates after
 #endif
 #if !defined(DEBUG) && !defined(PRED)
 		p.set_MAX_ITERATIONS (ml_iters[0]);     // the algorithm terminates after
@@ -275,10 +277,6 @@ int main ( int argc , char ** argv ) {
 		p.set_SOLUTION_FILE("solution1.txt");
 		p.set_STATS_FILE("stats1.txt","eval bbe obj sol poll_size mesh_size");
 #endif
-#ifdef DEBUG
-		p.set_SOLUTION_FILE("solution1.txt");
-		p.set_STATS_FILE("stats1.txt","eval bbe obj sol poll_size mesh_size");
-#endif
 		}
 		p.set_ADD_SEED_TO_FILE_NAMES(0);
 
@@ -286,26 +284,32 @@ int main ( int argc , char ** argv ) {
 #ifdef DEBUG
 		SaveData("x0.debug",dim,&(x0[0]));
 #endif
+
 		TranformNormal2Uniform(dim,x0);
 		CheckBound(0.9999,0.0001,dim,x0);
+
 #ifdef DEBUG
 		SaveData("u0.debug",dim,&(x0[0]));
 #endif
+
+#ifndef DEBUG
 		if( rank == 0)
 			SaveData("ui_start1.dat",dim,&x0[0]);
-		MPI_Barrier( MPI_COMM_WORLD );
+#endif
 
+		MPI_Barrier( MPI_COMM_WORLD );
 #ifndef PRED
 		p.set_X0 ("ui_start1.dat");  // starting point
 #endif
 #ifdef PRED
-		p.set_X0 ("solution4.txt");
+		string pred_init = "solution" + num2str(num_level) + ".txt";
+		p.set_X0 (pred_init.c_str());
 #endif
 		for(int i=ml_dims[0];i<dim;i++)
 			p.set_FIXED_VARIABLE(i); // Fix swi
 		p.check();
 #ifdef DEBUG
-		cout << "Generate OPCA Model" << endl;
+		//cout << "Generate OPCA Model" << endl;
 #endif
 		// custom evaluator creation:
 		My_Evaluator ev   ( p );
