@@ -25,6 +25,17 @@
 
 using namespace::boost::math;
 
+
+void LogOpcaError(const char* file_name, vector<double> xi, int n){
+	ofstream ofs;
+	ofs.open(file_name,std::ofstream::out | std::ofstream::app);
+	ofs << "O-PCA returns false at: ";
+	for(int i=0;i<n;i++)
+		ofs << xi[i] << " ";
+	ofs<<endl;
+	ofs.close();
+}
+
 void TranformUniform2Normal(int l , vector<double> &m){
 	for(int i = 0; i < l ; i++){
 		m[i] = 1.4142135623 * erf_inv( 2*m[i] - 1 );
@@ -42,8 +53,6 @@ double TransformUniform2Normal_2(double u,double mu, double sigma){
 	x = mu + 1.4142135623 * sigma * erf_inv( 2*u - 1 );
 	return x;
 }
-
-
 
 void GeneratePerm(int Nc, double *x, double *perm){
 	for(int i=0; i < Nc ; i++){

@@ -91,11 +91,18 @@ public:
 		double Nc = 3600;
 		vector<double> m;
 		m.resize(Nc);
-		opca_bm_->GenerateOPCARealization(&(xi[0]) , &(m[0]));
+		bool opca_flag;
+		opca_flag = opca_bm_->GenerateOPCARealization(&(xi[0]) , &(m[0]));
+		if(!opca_flag) // If O-PCA returns false, the solution is wrong
+		{
+			string log_file("opca_err_log.");
+			log_file += num2str(_rank);
+			LogOpcaError(log_file.c_str(), xi, dim_);
+			return false;       // the evaluation failed
+		}
 		vector<double> perm;
 		perm.resize(Nc);
 		GeneratePerm(Nc, &(m[0]), &(perm[0]));
-
 
 #ifdef DEBUG
 		SaveData("xi.debug",dim_,&(xi[0]));
@@ -162,7 +169,7 @@ public:
 	int    _initial_mesh_index;
 	int    _mesh_index;
 	Point  _initial_mesh_size;
-
+	int    _rank;
 };
 
 
@@ -264,8 +271,8 @@ int main ( int argc , char ** argv ) {
 		p.set_OPPORTUNISTIC_EVAL(0);
 		p.set_SPECULATIVE_SEARCH(0);
 #if defined(DEBUG) || defined(PRED)
-		//p.set_MAX_BB_EVAL(1);
-		p.set_MAX_ITERATIONS (ml_iters[0]);     // the algorithm terminates after
+		p.set_MAX_BB_EVAL(1);
+		//p.set_MAX_ITERATIONS (ml_iters[0]);     // the algorithm terminates after
 #endif
 #if !defined(DEBUG) && !defined(PRED)
 		p.set_MAX_ITERATIONS (ml_iters[0]);     // the algorithm terminates after
@@ -316,6 +323,7 @@ int main ( int argc , char ** argv ) {
 		ev.opca_bm_  = GenerateOPCAModel();
 		ev.dim_ = dim;
 		ev.xi_uc     = xi_uc;
+		ev._rank = rank;
 		// algorithm creation and execution:
 		Mads mads ( p , &ev );
 

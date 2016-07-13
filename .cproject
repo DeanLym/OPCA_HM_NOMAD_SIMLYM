@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?fileVersion 4.0.0?>
-
-<cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
 	<storageModule moduleId="org.eclipse.cdt.core.settings">
 		<cconfiguration id="intel.linux.x86_64.exe.rel.1529407590_13.0.0">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="intel.linux.x86_64.exe.rel.1529407590_13.0.0" moduleId="org.eclipse.cdt.core.settings" name="Release">
@@ -61,8 +59,8 @@
 									<listOptionValue builtIn="false" value="/data/cees/yiminliu/global/include/lapack"/>
 									<listOptionValue builtIn="false" value="/data/cees/yiminliu/global/include/opca"/>
 									<listOptionValue builtIn="false" value="/home/yiminliu/boost_1_56_0"/>
-									<listOptionValue builtIn="false" value="/home/yiminliu/nomad.3.6.2/src"/>
 									<listOptionValue builtIn="false" value="/usr/local/openmpi-1.10.0_intel14/include"/>
+									<listOptionValue builtIn="false" value="/home/yiminliu/packages/nomad.3.6.2/src"/>
 								</option>
 								<option id="intel.compilestep.coptions.1060342920" name="Additional Options" superClass="intel.compilestep.coptions" value="-DUSE_MPI -DDEBUG" valueType="string"/>
 								<inputType id="intel.cpp.compilestep.input.1079464734" superClass="intel.cpp.compilestep.input"/>
@@ -98,7 +96,7 @@
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
 								</inputType>
-								<outputType id="intel.linkstep.output.834377105" outputPrefix="TEST_DBG" superClass="intel.linkstep.output"/>
+								<outputType id="intel.linkstep.output.834377105" outputPrefix="DBG_" superClass="intel.linkstep.output"/>
 							</tool>
 						</toolChain>
 					</folderInfo>
