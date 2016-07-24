@@ -98,7 +98,9 @@ public:
 			string log_file("opca_err_log.");
 			log_file += num2str(_rank);
 			LogOpcaError(log_file.c_str(), xi, dim_);
-			return false;       // the evaluation failed
+			x.set_bb_output  ( 0 , 1e20); // objective value
+			count_eval = true; // count a black-box evaluation
+			return true;       // the evaluation failed
 		}
 		vector<double> perm;
 		perm.resize(Nc);
