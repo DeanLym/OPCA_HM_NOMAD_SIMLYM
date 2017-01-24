@@ -1,6 +1,7 @@
 /*-----------------------------------------------------*/
 /*  how to use the NOMAD library with a user function  */
 /*-----------------------------------------------------*/
+#include <mpi.h>
 #include "nomad.hpp"
 using namespace std;
 using namespace NOMAD; //avoids putting  everywhere
@@ -10,7 +11,7 @@ using namespace NOMAD; //avoids putting  everywhere
 #include "sim_model.hpp"
 #include "generate_opca_model.hpp"
 #include "util_funs.hpp"
-#include <mpi.h>
+
 // #include <armadillo>
 
 // using namespace arma;
